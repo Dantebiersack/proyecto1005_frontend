@@ -10,9 +10,8 @@ import {
   MdStarRate,
   MdManageAccounts,
   MdAssignment,
-  MdClose
+  MdClose,
 } from "react-icons/md";
-
 const sections = [
   {
     title: "Personal NearBiz",
@@ -98,7 +97,7 @@ export default function Sidebar({ open, onClose }) {
 
       <aside className={`nb-sidebar ${open ? "open" : ""}`}>
         <button className="nb-close-btn" onClick={onClose} aria-label="Cerrar">
-          <MdClose size={20} />
+          <MdClose size={20} color="#fff" />
         </button>
 
         <div className="nb-user">
