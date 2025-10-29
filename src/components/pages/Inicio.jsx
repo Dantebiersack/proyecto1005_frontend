@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import NavbarInicio from "../Navbar/NavbarInicio";
+import { useNavigate } from "react-router-dom";
+import NavbarInicio from "../Navbar/NavbarInicio.jsx"; // 🔧 ruta corregida
 import "./Inicio.css";
 
-function Inicio() {
+export default function Inicio() {
+  const navigate = useNavigate();
   const [index, setIndex] = useState(0);
   const [modal, setModal] = useState(null);
 
@@ -17,20 +19,23 @@ function Inicio() {
       setIndex((prev) => (prev + 1) % images.length);
     }, 3500);
     return () => clearInterval(timer);
-  }, );
+  }, [images.length]); // 🔧 dependencias (o [] si prefieres)
 
   const info = {
     nosotros: {
       title: "Sobre Nosotros",
-      text: "Somos una empresa que busca ayudarte a mantener organizadas tus citas con tus clientes, de modo que tengas todo al alcance de tus manos. Nuestra misión es simplificar la gestión de tu tiempo y fortalecer la relación con tus clientes mediante una plataforma intuitiva, rápida y segura. NearBiz nació para conectar negocios y personas de manera más eficiente, moderna y confiable.",
+      text:
+        "Somos una empresa que busca ayudarte a mantener organizadas tus citas con tus clientes, de modo que tengas todo al alcance de tus manos. Nuestra misión es simplificar la gestión de tu tiempo y fortalecer la relación con tus clientes mediante una plataforma intuitiva, rápida y segura. NearBiz nació para conectar negocios y personas de manera más eficiente, moderna y confiable.",
     },
     ofrecemos: {
       title: "Qué te ofrecemos",
-      text: "Te ofrecemos la oportunidad de digitalizar tu negocio y formar parte de una red de empresas confiables. Con NearBiz podrás aumentar tu visibilidad, automatizar tus citas, ofrecer horarios flexibles y permitir que tus clientes agenden de forma rápida y segura. Además, tendrás acceso a métricas y herramientas para mejorar la atención en tu empresa y la satisfacción de tus clientes.",
+      text:
+        "Te ofrecemos la oportunidad de digitalizar tu negocio y formar parte de una red de empresas confiables. Con NearBiz podrás aumentar tu visibilidad, automatizar tus citas, ofrecer horarios flexibles y permitir que tus clientes agenden de forma rápida y segura. Además, tendrás acceso a métricas y herramientas para mejorar la atención en tu empresa y la satisfacción de tus clientes.",
     },
     app: {
       title: "Información de nuestra aplicación",
-      text: "Nuestra aplicación móvil permite que tus clientes te encuentren fácilmente por ubicación y agenden citas contigo sin complicaciones. Todo dentro de un entorno seguro, moderno y personalizado. Con NearBiz, tu negocio estará más cerca que nunca de tus clientes y tu gestión será más simple que nunca.",
+      text:
+        "Nuestra aplicación móvil permite que tus clientes te encuentren fácilmente por ubicación y agenden citas contigo sin complicaciones. Todo dentro de un entorno seguro, moderno y personalizado. Con NearBiz, tu negocio estará más cerca que nunca de tus clientes y tu gestión será más simple que nunca.",
     },
   };
 
@@ -86,8 +91,15 @@ function Inicio() {
 
       {/* BOTONES ABAJO */}
       <div className="hero-buttons">
-        <button className="btn-primary">Ver Membresías</button>
-        <button className="btn-secondary">Registrar mi Empresa</button>
+        <button className="btn-primary" onClick={() => navigate("/membresias")}>
+          Ver Membresías
+        </button>
+        <button
+          className="btn-secondary"
+          onClick={() => navigate("/registro-empresa")}
+        >
+          Registrar mi Empresa
+        </button>
       </div>
 
       {/* MODAL */}
@@ -103,5 +115,3 @@ function Inicio() {
     </div>
   );
 }
-
-export default Inicio;

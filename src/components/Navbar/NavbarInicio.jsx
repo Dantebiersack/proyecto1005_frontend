@@ -1,6 +1,11 @@
+// src/components/Navbar/NavbarInicio.jsx
 import "./NavbarInicio.css";
+import { MdMenu } from "react-icons/md";
+import { useAuth } from "../../auth/AuthContext";
 
-function NavbarInicio() {
+function NavbarInicio({ showMenu = false, onMenuClick }) {
+  const { user } = useAuth();
+
   return (
     <header className="navbar-inicio">
       <div className="navbar-container">
@@ -13,10 +18,17 @@ function NavbarInicio() {
           <span className="logo-text">NEARBIZ</span>
         </div>
 
-        <nav className="navbar-links">
-          <a href="/">Inicio</a>
-          <a href="/login">Iniciar Sesion</a>
-        </nav>
+        {/* Si hay sesión y estamos en zona privada, muestra el botón menú */}
+        {showMenu && user ? (
+          <button className="navbar-menu-btn" onClick={onMenuClick} aria-label="Abrir menú">
+            <MdMenu size={22} />
+          </button>
+        ) : (
+          <nav className="navbar-links">
+            <a href="/">Inicio</a>
+            <a href="/login">Iniciar Sesion</a>
+          </nav>
+        )}
       </div>
     </header>
   );

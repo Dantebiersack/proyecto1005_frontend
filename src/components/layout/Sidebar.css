@@ -1,0 +1,149 @@
+/* ===== Overlay ===== */
+.nb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+.nb-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ===== Sidebar (match con login) ===== */
+.nb-sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 1000;
+  width: 300px;
+  background: linear-gradient(180deg, #0a3d62 0%, #2d63b4 100%);
+  color: #eaf2ff;
+  padding: 16px 14px 14px;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  transform: translateX(-100%);
+  transition: transform 0.28s ease;
+}
+.nb-sidebar.open {
+  transform: translateX(0);
+}
+
+/* Botón cerrar */
+.nb-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  cursor: pointer;
+  opacity: .95;
+}
+.nb-close-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* Usuario */
+.nb-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 4px 16px;
+}
+.nb-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+.nb-name {
+  font-weight: 800;
+  letter-spacing: 0.3px;
+}
+.nb-email {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* Secciones */
+.nb-section {
+  margin-top: 18px;
+}
+.nb-section-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #cfe3ff;
+  opacity: 0.88;
+  margin: 8px 6px;
+}
+
+/* Links */
+.nb-link {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 10px;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  background: transparent;
+  transition: background 0.18s ease, transform 0.05s ease;
+}
+.nb-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.nb-link.active {
+  background: linear-gradient(135deg, #3843c2, #2c35a3);
+  box-shadow: 0 6px 18px rgba(56, 67, 194, 0.35);
+}
+
+/* Footer */
+.nb-footer {
+  margin-top: 22px;
+  padding: 8px 4px;
+}
+.nb-logout {
+  width: 100%;
+  padding: 11px;
+  border-radius: 10px;
+  border: 0;
+  cursor: pointer;
+  background: #e63946;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(230, 57, 70, 0.25);
+}
+.nb-logout:hover {
+  background: #c92f3c;
+}
+
+/* Contenido general (si quieres) */
+.nb-content {
+  padding: 16px;
+}
+
+/* Quitar bullets y espaciados */
+.nb-section ul { list-style: none; margin: 0; padding: 0; }
+.nb-section li { margin: 0; }
+
+/* Link con icono */
+.nb-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 10px; text-decoration: none;
+}
+
+/* Tamaño y opacidad del icono */
+.nb-icon { opacity: .95; }
+
