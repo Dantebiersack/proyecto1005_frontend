@@ -19,25 +19,25 @@ const sections = [
       {
         to: "/gestion-empresas",
         label: "Gestión de empresas",
-        roles: ["admin", "personal"],
+        roles: ["adminNearbiz", "personal", "adminNegocio"],
         Icon: MdBusiness,
       },
       {
         to: "/gestion-usuarios",
         label: "Gestión de usuarios",
-        roles: ["admin", "personal"],
+        roles: ["adminNearbiz", "personal", "adminNegocio"],
         Icon: MdGroup,
       },
       {
         to: "/solicitudes-empresas",
         label: "Solicitudes de empresas",
-        roles: ["admin", "personal"],
+        roles: ["adminNearbiz", "personal", "adminNegocio"],
         Icon: MdAssignment,
       },
       {
         to: "/gestion-cuenta",
         label: "Gestión de cuenta",
-        roles: ["admin", "personal"],
+        roles: ["adminNearbiz", "personal", "adminNegocio"],
         Icon: MdManageAccounts,
       },
     ],
@@ -48,30 +48,31 @@ const sections = [
       {
         to: "/mi-empresa",
         label: "Mi empresa",
-        roles: ["admin", "negocio"],
+        roles: ["adminNearbiz", "personal", "adminNegocio"],
         Icon: MdBusiness,
       },
       {
         to: "/gestion-empleados",
         label: "Gestión empleados",
-        roles: ["admin", "negocio"],
+        roles: ["adminNearbiz", "personal", "adminNegocio"],
         Icon: MdGroup,
       },
       {
         to: "/citas",
         label: "Citas",
-        roles: ["admin", "negocio"],
+        roles: ["adminNearbiz", "personal", "adminNegocio"],
         Icon: MdEvent,
       },
       {
         to: "/valoraciones",
         label: "Valoraciones",
-        roles: ["admin", "negocio"],
+        roles: ["adminNearbiz", "personal", "adminNegocio"],
         Icon: MdStarRate,
       },
     ],
   },
 ];
+
 export default function Sidebar({ open, onClose }) {
   // <-- props bien
   const { user, logout } = useAuth();
@@ -104,7 +105,7 @@ export default function Sidebar({ open, onClose }) {
           <img className="nb-avatar" src="https://i.pravatar.cc/80" alt="" />
           <div>
             <div className="nb-name">{user?.name ?? "Invitado"}</div>
-            <div className="nb-email">ma003r52@gmail.com</div>
+            <div className="nb-email">{user?.email ?? "sin-correo"}</div>
           </div>
         </div>
 

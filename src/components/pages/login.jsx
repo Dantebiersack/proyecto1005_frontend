@@ -1,55 +1,39 @@
 import React, { useState } from "react";
 import "./login.css";
-import NavbarInicio from "../Navbar/NavbarInicio"; // tu menú
+import NavbarInicio from "../Navbar/NavbarInicio";
+import { useAuth } from "../../auth/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../auth/AuthContext"; // <- del mock que hicimos
 
 export default function Login() {
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const { loginAs, user } = useAuth();
+  const [form, setForm] = useState({
+    username: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // TEMP: credenciales y rol (mock)
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  // Roles de ejemplo: admin, personal, negocio
-  const [role, setRole] = useState("negocio"); 
-
-  // Dónde aterriza cada rol al entrar
-  const homeByRole = {
-    admin: "/gestion-empresas",
-    personal: "/gestion-empresas",
-    negocio: "/mi-empresa",
-  };
-
-  const handleSubmit = (e) => {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // Aquí iría tu llamada al backend; por ahora solo setea el rol mock
-    loginAs([role]); // p.ej. ['negocio'] o ['admin']
-    const next = homeByRole[role] || "/";
-    navigate(next, { replace: true });
-  };
-
-  const goRegister = () => {
-    navigate("/registro-empresa");
-  };
-
-  // Si ya está logueado, mándalo al home correspondiente
-  if (user?.roles?.length) {
-    const r = user.roles[0];
-    const next = homeByRole[r] || "/";
-    navigate(next, { replace: true });
-    return null;
+    setError("");
+    setLoading(true);
+    try {
+      await login(form.username, form.password);
+      navigate("/mi-empresa"); // o /dashboard
+    } catch (err) {
+      console.error(err);
+      setError("Usuario o contraseña inválidos");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <div className="login-page">
-      {/* === NAVBAR === */}
       <NavbarInicio />
-
-      {/* === CONTENEDOR PRINCIPAL === */}
       <div className="login-wrapper">
         <div className="login-container">
-          {/* Sección izquierda: logo */}
           <div className="login-left">
             <div className="logo-content">
               <img
@@ -62,7 +46,6 @@ export default function Login() {
             </div>
           </div>
 
-          {/* Sección derecha: formulario */}
           <div className="login-right">
             <div className="login-card">
               <div className="login-avatar">
@@ -74,38 +57,33 @@ export default function Login() {
                 <input
                   type="text"
                   id="username"
-                  placeholder="Ingresa tu usuario"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  autoComplete="username"
+                  value={form.username}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, username: e.target.value }))
+                  }
+                  placeholder="Ingresa tu usuario o email"
+                  required
                 />
 
                 <label htmlFor="password">CONTRASEÑA</label>
                 <input
                   type="password"
                   id="password"
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm((p) => ({ ...p, password: e.target.value }))
+                  }
                   placeholder="********"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  autoComplete="current-password"
+                  required
                 />
 
-                {/* Selector de rol temporal (mientras no hay back) */}
-                <label htmlFor="rol" style={{ marginTop: 8 }}>ROL (temporal)</label>
-                <select
-                  id="rol"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  className="login-select"
-                >
-                  <option value="negocio">Negocio</option>
-                  <option value="personal">Personal NearBiz</option>
-                  <option value="admin">Admin</option>
-                </select>
-
-                <button type="submit" className="btn-ingresar" style={{ marginTop: 12 }}>
-                  INGRESAR
+                <button type="submit" className="btn-ingresar" disabled={loading}>
+                  {loading ? "Ingresando..." : "INGRESAR"}
                 </button>
+
+                {error && (
+                  <p style={{ color: "#ffb3b3", marginTop: "10px" }}>{error}</p>
+                )}
               </form>
 
               <p className="login-register-text">
@@ -113,7 +91,7 @@ export default function Login() {
                 DA CLICK AQUÍ PARA REGÍSTRATE
               </p>
 
-              <button type="button" className="btn-crear-cuenta" onClick={goRegister}>
+              <button type="button" className="btn-crear-cuenta">
                 CREAR UNA CUENTA
               </button>
             </div>

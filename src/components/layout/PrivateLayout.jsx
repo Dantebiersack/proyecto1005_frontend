@@ -1,25 +1,28 @@
 // src/components/layout/PrivateLayout.jsx
-import { useState } from "react";
-import { Outlet } from "react-router-dom";
-import Sidebar from "./Sidebar";
 import NavbarInicio from "../Navbar/NavbarInicio";
+import Sidebar from "./Sidebar";
+import { useState, useEffect } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
-import "./PrivateLayout.css";
 
 export default function PrivateLayout() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user) navigate("/login", { replace: true });
+  }, [user, navigate]);
 
   if (!user) return null;
 
   return (
-    <div className="nb-app">
+    <>
+      <NavbarInicio onMenuClick={() => setOpen(true)} />
       <Sidebar open={open} onClose={() => setOpen(false)} />
-      {/* Usamos tu Navbar como topbar en privado, con botón de menú */}
-      <NavbarInicio showMenu onMenuClick={() => setOpen(true)} />
       <main className="nb-content">
         <Outlet />
       </main>
-    </div>
+    </>
   );
 }
