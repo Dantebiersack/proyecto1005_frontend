@@ -2,9 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import PrivateLayout from "./components/layout/PrivateLayout.jsx";
 import RoleGuard from "./components/RoleGuard.jsx";
 
-// 👇 OJO: ahora desde components/pages/...
-import Inicio from "./components/pages/Inicio.jsx"; // mueve tu Inicio.jsx aquí o ajusta la ruta real
-import Login from "./components/pages/login.jsx";   // idem (si tu archivo está con mayúscula, respétalas)
+import LandingOrHome from "./components/pages/LandingOrHome.jsx";
+import Login from "./components/pages/login.jsx";
 
 // Negocio
 import MiEmpresa from "./components/pages/Negocio/MiEmpresa.jsx";
@@ -17,27 +16,92 @@ import GestionEmpresas from "./components/pages/personalNearbiz/GestionEmpresas.
 import GestionPersonal from "./components/pages/personalNearbiz/GestionPersonal.jsx";
 import SolicitudEmpresas from "./components/pages/personalNearbiz/SolicitudEmpresas.jsx";
 import GestionCuenta from "./components/pages/personalNearbiz/GestionCuenta.jsx";
+import GestionUsuarios from "./components/pages/personalNearbiz/GestionUsuarios.jsx";
 
 export default function App() {
   return (
     <Routes>
-      {/* Públicas */}
-      <Route path="/" element={<Inicio />} />
+      {/* 👇 aquí ya decide si landing o redirección */}
+      <Route path="/" element={<LandingOrHome />} />
+
       <Route path="/login" element={<Login />} />
 
-      {/* Privadas */}
       <Route element={<PrivateLayout />}>
         {/* Personal */}
-        <Route path="/gestion-empresas" element={<RoleGuard allow={['admin','personal']}><GestionEmpresas/></RoleGuard>} />
-        <Route path="/gestion-usuarios" element={<RoleGuard allow={['admin','personal']}><GestionPersonal/></RoleGuard>} />
-        <Route path="/solicitudes-empresas" element={<RoleGuard allow={['admin','personal']}><SolicitudEmpresas/></RoleGuard>} />
-        <Route path="/gestion-cuenta" element={<RoleGuard allow={['admin','personal']}><GestionCuenta/></RoleGuard>} />
+        <Route
+          path="/gestion-empresas"
+          element={
+            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+              <GestionEmpresas />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/gestion-personal"
+          element={
+            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+              <GestionPersonal />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/solicitudes-empresas"
+          element={
+            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+              <SolicitudEmpresas />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/gestion-cuenta"
+          element={
+            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+              <GestionCuenta />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/gestion-usuarios"
+          element={
+            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+              <GestionUsuarios />
+            </RoleGuard>
+          }
+        />
 
-        {/* Negocios */}
-        <Route path="/mi-empresa" element={<RoleGuard allow={['admin','negocio']}><MiEmpresa/></RoleGuard>} />
-        <Route path="/gestion-empleados" element={<RoleGuard allow={['admin','negocio']}><GestionEmpleados/></RoleGuard>} />
-        <Route path="/citas" element={<RoleGuard allow={['admin','negocio']}><Citas/></RoleGuard>} />
-        <Route path="/valoraciones" element={<RoleGuard allow={['admin','negocio']}><Valoraciones/></RoleGuard>} />
+        {/* Negocio */}
+        <Route
+          path="/mi-empresa"
+          element={
+            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+              <MiEmpresa />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/gestion-empleados"
+          element={
+            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+              <GestionEmpleados />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/citas"
+          element={
+            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+              <Citas />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/valoraciones"
+          element={
+            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+              <Valoraciones />
+            </RoleGuard>
+          }
+        />
       </Route>
     </Routes>
   );

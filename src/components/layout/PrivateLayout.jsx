@@ -17,12 +17,17 @@ export default function PrivateLayout() {
   if (!user) return null;
 
   return (
-    <>
-      <NavbarInicio onMenuClick={() => setOpen(true)} />
-      <Sidebar open={open} onClose={() => setOpen(false)} />
-      <main className="nb-content">
-        <Outlet />
-      </main>
-    </>
+    <div className="nb-shell">
+      {/* header fijo arriba */}
+      <NavbarInicio onMenuClick={() => setOpen(true)} user={user} />
+
+      {/* cuerpo: sidebar + content */}
+      <div className="nb-main">
+        <Sidebar open={open} onClose={() => setOpen(false)} />
+        <main className="nb-content">
+          <Outlet />
+        </main>
+      </div>
+    </div>
   );
 }

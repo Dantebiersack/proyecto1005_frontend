@@ -41,7 +41,7 @@ export default function Inicio() {
 
   return (
     <div className="inicio-container">
-      <NavbarInicio />
+      <NavbarInicio  />
 
       {/* CARRUSEL */}
       <div className="carrusel">

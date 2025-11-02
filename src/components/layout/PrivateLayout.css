@@ -1,8 +1,24 @@
-.nb-app {
+/* contenedor global del layout autenticado */
+.nb-shell {
+  min-height: 100vh;
+  background: #ecf0f3; /* mismo fondo que tu pantalla */
   display: flex;
+  flex-direction: column;
 }
+
+/* debajo del header */
+.nb-main {
+  flex: 1;
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+
+/* contenido real */
 .nb-content {
   flex: 1;
-  min-height: 100vh;
-  padding: 16px;
+  width: 100%;
+  min-height: calc(100vh - 70px);
+  padding: 24px 28px 32px 28px;
+  box-sizing: border-box;
+  margin-top: 100px;
 }
