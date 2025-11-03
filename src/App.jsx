@@ -10,6 +10,7 @@ import MiEmpresa from "./components/pages/Negocio/MiEmpresa.jsx";
 import GestionEmpleados from "./components/pages/Negocio/GestionEmpleados.jsx";
 import Citas from "./components/pages/Negocio/Citas.jsx";
 import Valoraciones from "./components/pages/Negocio/Valoraciones.jsx";
+import RegistroEmpresa from "./components/pages/Negocio/RegistroEmpresa.jsx";
 
 // Personal Nearbiz
 import GestionEmpresas from "./components/pages/personalNearbiz/GestionEmpresas.jsx";
@@ -25,6 +26,8 @@ export default function App() {
       <Route path="/" element={<LandingOrHome />} />
 
       <Route path="/login" element={<Login />} />
+
+       <Route path="/registro-empresa" element={<RegistroEmpresa />} />
 
       <Route element={<PrivateLayout />}>
         {/* Personal */}
@@ -69,7 +72,10 @@ export default function App() {
           }
         />
 
+
+
         {/* Negocio */}
+       
         <Route
           path="/mi-empresa"
           element={

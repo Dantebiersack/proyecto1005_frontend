@@ -1,0 +1,182 @@
+/* ===== Contenedor General ===== */
+.register-page {
+  width: 100%;
+}
+
+.register-wrapper {
+  /* 1. Fondo gris claro en lugar del degradado */
+  background-color: #f0f2f5; 
+  width: 100%;
+  min-height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+/* ===== Tarjeta de Registro ===== */
+.register-card {
+  /* 1. Tarjeta blanca con sombra sutil */
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  
+  /* Más ancha para las dos columnas */
+  width: 90%;
+  max-width: 900px; 
+  
+  padding: 40px;
+  border-radius: 20px;
+  color: #333; /* Texto oscuro */
+  text-align: center;
+}
+
+.register-card h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #0a3d62; /* Color de tu marca */
+}
+
+.register-card p {
+  font-size: 1rem;
+  margin-bottom: 24px;
+  color: #555;
+}
+
+/* ===== Formulario ===== */
+.register-form {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.register-form fieldset {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+  
+  /* 2. Cuadrícula de 2 columnas */
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dos columnas iguales */
+  gap: 16px 20px; /* Espaciado de fila y columna */
+}
+
+.register-form legend {
+  font-size: 1.3rem;
+  font-weight: 600;
+  padding: 0 10px;
+  color: #0a3d62;
+}
+
+/* 2. Contenedor para cada grupo (label + input) */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 2. Clase para que un campo ocupe ambas columnas */
+.form-group.span-2 {
+  grid-column: span 2;
+}
+
+.register-form label {
+  color: #333;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.register-form input,
+.register-form select,
+.register-form textarea {
+  padding: 10px 12px;
+  border: 1px solid #ccc; /* Borde visible */
+  border-radius: 6px;
+  outline: none;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #f9f9f9;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.register-form input:focus,
+.register-form select:focus,
+.register-form textarea:focus {
+  border-color: #2d63b4;
+  background-color: #fff;
+  box-shadow: 0 0 0 3px rgba(45, 99, 180, 0.15);
+}
+
+.register-form textarea {
+  min-height: 80px;
+  font-family: inherit;
+}
+
+/* Botón de envío */
+.btn-submit-registro {
+  background-color: #39b58b; /* Verde de tu login */
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 10px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  font-size: 1rem;
+  width: 100%;
+  
+  /* 2. Hacer que el botón ocupe ambas columnas */
+  grid-column: span 2; 
+}
+
+.btn-submit-registro:hover {
+  background-color: #2a9d8f;
+}
+
+.btn-submit-registro:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.register-error {
+  color: #d93025;
+  margin-top: 15px;
+  text-align: center;
+  font-weight: 600;
+  grid-column: span 2; /* Ocupa ambas columnas */
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .register-wrapper {
+    padding: 0;
+  }
+  .register-card {
+    width: 100%;
+    height: 100%;
+    min-height: 100vh;
+    border-radius: 0;
+    padding: 25px;
+  }
+  
+  /* 2. En móvil, todo a 1 columna */
+  .register-form fieldset {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-group.span-2 {
+    grid-column: span 1;
+  }
+
+  .btn-submit-registro,
+  .register-error {
+    grid-column: span 1;
+  }
+}
+
