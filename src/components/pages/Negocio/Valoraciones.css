@@ -1,0 +1,151 @@
+.valoraciones-container {
+  display: flex;
+  gap: 24px;
+  padding: 80px 24px 24px 24px; 
+  font-family: "Poppins", sans-serif;
+  color: #1c2b59;
+  background-color: #f9f9f9;
+  min-height: 80vh;
+}
+
+.valoraciones-lista {
+  flex: 2;
+}
+
+.valoraciones-lista h2 {
+  margin-bottom: 16px;
+  color: #1c2b59;
+  font-size: 1.8rem;
+  border-bottom: 3px solid #4caf50;
+  display: inline-block;
+  padding-bottom: 4px;
+}
+
+.filtro {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filtro label {
+  font-weight: 600;
+  color: #1c2b59;
+  font-size: 1rem;
+}
+
+.filtro select {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #1c2b59;
+  background-color: #1c2b59;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filtro select:hover {
+  background-color: #4caf50;
+}
+
+.comentario-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.comentario-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.header-comentario {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.cliente-nombre {
+  font-weight: 600;
+  color: #1c2b59;
+  font-size: 1rem;
+}
+
+.estrellas {
+  font-size: 20px;
+  color: #ffb400;
+}
+
+.comentario {
+  font-size: 1rem;
+  margin-bottom: 12px;
+}
+
+.responder {
+  display: flex;
+  gap: 10px;
+}
+
+.responder input {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  transition: border 0.2s ease;
+}
+
+.responder input:focus {
+  border-color: #4caf50;
+  outline: none;
+}
+
+.responder button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background-color: #1c2b59;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.responder button:hover {
+  background-color: #4caf50;
+}
+
+.valoraciones-grafica {
+  flex: 1;
+  background-color: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.valoraciones-grafica h2 {
+  margin-bottom: 8px;
+  font-size: 1.5rem;
+  color: #1c2b59;
+  border-bottom: 3px solid #4caf50;
+  display: inline-block;
+  padding-bottom: 4px;
+}
+
+.promedio {
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  color: #1c2b59;
+}
+
+.valoraciones-container p {
+  font-size: 1rem;
+  color: #1c2b59;
+}

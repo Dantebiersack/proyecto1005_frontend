@@ -1,0 +1,190 @@
+.miempresa-container {
+  max-width: 1000px;
+  margin: 50px auto;
+  padding: 30px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  font-family: "Poppins", sans-serif;
+  color: #1b1b1b;
+}
+
+.miempresa-container h1 {
+  text-align: center;
+  color: #1c2b59;
+  font-size: 2.2rem;
+  margin-bottom: 25px;
+}
+
+.datos-empresa {
+  line-height: 1.8;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.datos-empresa a {
+  color: #1c2b59;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.datos-empresa a:hover {
+  text-decoration: underline;
+}
+
+.miempresa-form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.form-row {
+  display: flex;
+  gap: 40px;
+}
+
+.form-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+label {
+  font-weight: 600;
+  color: #1c2b59;
+}
+
+input,
+textarea,
+select {
+  padding: 10px;
+  border: 1.5px solid #d0d6e0;
+  border-radius: 10px;
+  font-size: 15px;
+  background-color: #f9f9f9;
+  color: #000; /* 🔹 Texto negro */
+  transition: all 0.2s ease;
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background-color: #eceff1;
+  color: #555;
+  cursor: not-allowed;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #1c2b59;
+  outline: none;
+  background-color: #fff;
+  color: #000; /* 🔹 Mantener negro al enfocar */
+}
+
+textarea {
+  resize: none;
+  min-height: 100px;
+}
+
+.botones {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+button {
+  border: none;
+  padding: 12px 25px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+button.editar {
+  background-color: #1c2b59;
+  color: white;
+}
+
+button.editar:hover {
+  background-color: #142046;
+}
+
+button.guardar {
+  background-color: #00c897;
+  color: white;
+}
+
+button.guardar:hover {
+  background-color: #00a67e;
+}
+
+button.cancelar {
+  background-color: #ef476f;
+  color: white;
+}
+
+button.cancelar:hover {
+  background-color: #d43f60;
+}
+
+/* 🔹 Modal flotante */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  padding: 20px; /* Para que no quede pegado al borde */
+}
+
+.modal {
+  background-color: white;
+  width: 90%;
+  max-width: 850px;
+  max-height: 90vh; /* 🔹 Limita la altura del modal */
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(28, 43, 89, 0.3);
+  overflow-y: auto; /* 🔹 Agrega scroll vertical si el contenido se pasa */
+  animation: slideIn 0.3s ease;
+}
+
+.modal h2 {
+  color: #1c2b59;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mensaje {
+  text-align: center;
+  font-weight: 500;
+}
+
+.success {
+  color: #00c897;
+}
+
+.error {
+  color: #ef476f;
+}

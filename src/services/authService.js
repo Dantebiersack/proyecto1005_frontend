@@ -53,7 +53,7 @@ export function logout() {
   localStorage.removeItem("nearbiz_user");
 }
 
-export function getCurrentUser() {
+/*export function getCurrentUser() {
   const str = localStorage.getItem("nearbiz_user");
   if (!str) return null;
   try {
@@ -66,4 +66,19 @@ export function getCurrentUser() {
   } catch (e) {
     return null;
   }
+}*/
+
+export function getCurrentUser() {
+  const str = localStorage.getItem("nearbiz_user");
+  if (!str) return null;
+  try {
+    const u = JSON.parse(str);
+    if (!u.email && u.name && u.name.indexOf("@") !== -1) {
+      u.email = u.name;
+    }
+    return u;
+  } catch {
+    return null;
+  }
 }
+
