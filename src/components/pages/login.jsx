@@ -85,15 +85,6 @@ export default function Login() {
                   <p style={{ color: "#ffb3b3", marginTop: "10px" }}>{error}</p>
                 )}
               </form>
-
-              <p className="login-register-text">
-                ¿NO CUENTAS CON UNA CUENTA?<br />
-                DA CLICK AQUÍ PARA REGÍSTRATE
-              </p>
-
-              <button type="button" className="btn-crear-cuenta">
-                CREAR UNA CUENTA
-              </button>
             </div>
           </div>
         </div>

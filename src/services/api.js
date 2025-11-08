@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "https://localhost:7099/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "https://nearbizbackend2.onrender.com/api",
 });
 
 // Leer token del storage
