@@ -11,6 +11,7 @@ import {
   MdManageAccounts,
   MdAssignment,
   MdClose,
+  MdCreditCard,
 } from "react-icons/md";
 const sections = [
   {
@@ -40,6 +41,18 @@ const sections = [
         roles: ["adminNearbiz", "personal", "adminNegocio"],
         Icon: MdManageAccounts,
       },
+      {
+        to: "/gestion-membresias",
+        label: "Membresías",
+        roles: ["adminNearbiz"],
+        Icon: MdCreditCard,
+      },
+      {
+        to: "/gestion-citas",
+        label: "Citas",
+        roles: ["adminNearbiz"],
+        Icon: MdEvent,
+      }
     ],
   },
   {

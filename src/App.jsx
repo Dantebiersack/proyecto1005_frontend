@@ -18,6 +18,8 @@ import GestionPersonal from "./components/pages/personalNearbiz/GestionPersonal.
 import SolicitudEmpresas from "./components/pages/personalNearbiz/SolicitudEmpresas.jsx";
 import GestionCuenta from "./components/pages/personalNearbiz/GestionCuenta.jsx";
 import GestionUsuarios from "./components/pages/personalNearbiz/GestionUsuarios.jsx";
+import GestionMembresias from "./components/pages/personalNearbiz/GestionMembresias.jsx";
+import GestionCitas from "./components/pages/personalNearbiz/GestionCitas.jsx";
 
 export default function App() {
   return (
@@ -48,6 +50,14 @@ export default function App() {
           }
         />
         <Route
+          path="/gestion-membresias"
+          element={
+            <RoleGuard allow={["adminNearbiz",]}>
+              <GestionMembresias />
+            </RoleGuard>
+          }
+        />
+        <Route
           path="/solicitudes-empresas"
           element={
             <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
@@ -71,8 +81,14 @@ export default function App() {
             </RoleGuard>
           }
         />
-
-
+        <Route
+          path="/gestion-citas"
+          element={
+            <RoleGuard allow={["adminNearbiz"]}>
+              <GestionCitas />
+            </RoleGuard>
+          }
+        />
 
         {/* Negocio */}
        
