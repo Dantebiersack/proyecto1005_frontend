@@ -8,7 +8,7 @@ export async function login(userOrEmail, password) {
   });
 
   const data = resp.data;
-  console.log("LOGIN RESP >>>", data); // 👈 mira esto en consola
+  console.log("LOGIN RESP >>>", data); 
 
   // el back puede mandar PascalCase
   const token = data.token || data.Token;

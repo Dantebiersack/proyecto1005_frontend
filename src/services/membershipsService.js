@@ -1,41 +1,44 @@
 // src/services/membershipsService.js
 import api from "./api";
 
-/**
- * Obtiene todas las membresías (incluso inactivas si se pide).
- */
+/** Lista admin (activos/inactivos) */
 export async function getMembresiasAdmin({ includeInactive = true } = {}) {
-  const { data } = await api.get(`/Membresias/admin?includeInactive=${includeInactive}`);
-  return data;
+  const { data } = await api.get(
+    `/Membresias/admin?includeInactive=${includeInactive}`
+  );
+  return data; // devuelve PascalCase según el backend
 }
 
-/**
- * Actualiza el precio u otros datos de una membresía.
- */
+/** Actualiza una membresía (precio, negocio, etc.) */
 export async function updateMembresia(id, body) {
+  // body debe ir en PascalCase si mandas esos campos: { PrecioMensual, IdNegocio, UltimaRenovacion? }
   await api.put(`/Membresias/${id}`, body);
 }
 
-/**
- * Renueva la membresía, actualizando la fecha de última renovación.
- */
-export async function renewMembresia(id) {
-  await api.patch(`/Membresias/${id}/renew`);
+/** Renueva (actualiza UltimaRenovacion a ahora por defecto) */
+export async function renewMembresia(id, fechaISO = null) {
+  // En el backend es POST /:id/renew, no PATCH
+  const payload = fechaISO ? { Fecha: fechaISO } : {};
+  await api.post(`/Membresias/${id}/renew`, payload);
 }
 
-/**
- * Da de baja (soft delete) una membresía.
- */
+/** Baja lógica (estado=false) */
 export async function softDeleteMembresia(id) {
   await api.delete(`/Membresias/${id}`);
 }
 
-/**
- * Crea una membresía nueva para un negocio que no tenga una.
- */
-export async function createMembershipForBusiness(idNegocio, precioMensual) {
-  const { data } = await api.post(`/Membresias/create-for-business/${idNegocio}`, {
-    precioMensual,
+/** (Opcional) Restaurar (estado=true) */
+export async function restoreMembresia(id) {
+  await api.post(`/Membresias/${id}/restore`);
+}
+
+/** Crear membresía para un negocio (si no tiene) */
+export async function createMembershipForBusiness(idNegocio, precioMensual, ultimaRenovacionISO = null) {
+  // En el backend es POST / (no /create-for-business/:id)
+  const { data } = await api.post(`/Membresias`, {
+    IdNegocio: idNegocio,
+    PrecioMensual: precioMensual,
+    UltimaRenovacion: ultimaRenovacionISO, // opcional (o null)
   });
-  return data;
+  return data; // PascalCase
 }

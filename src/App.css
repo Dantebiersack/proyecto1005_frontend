@@ -53,3 +53,7 @@ body {
 .page h2 {
   color: #0984e3;
 }
+
+body.swal2-height-auto {
+  height: 100% !important
+}

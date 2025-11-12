@@ -7,10 +7,24 @@ import {
   softDeleteMembresia,
   renewMembresia,
   createMembershipForBusiness,
+  // opcional:
+  // restoreMembresia,
 } from "../../../services/membershipsService";
 import "../personalNearbiz/GestionUsuarios.css";
 
 const PLAN_DAYS = 30;
+
+// helpers
+const toNumber = (v, fallback = 0) => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+};
+const formatMoney = (v) =>
+  new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN",
+    minimumFractionDigits: 2,
+  }).format(toNumber(v, 0));
 
 function addDays(dateISO, days) {
   if (!dateISO) return null;
@@ -51,9 +65,10 @@ export default function GestionMembresias() {
       const mapped = (data || []).map((r) => {
         const idMembresia = r.idMembresia ?? r.IdMembresia ?? r.id ?? null;
         const idNegocio = r.idNegocio ?? r.IdNegocio ?? null;
-        const nombreNegocio = r.nombreNegocio ?? r.NombreNegocio ?? "";
-        const precioMensual = r.precioMensual ?? r.PrecioMensual ?? 0;
-        const estado = (r.estado ?? r.Estado) ?? false;
+        const nombreNegocio =
+          r.NombreNegocio ?? r.nombreNegocio ?? ""; // <-- prioriza PascalCase del endpoint
+        const precioMensual = toNumber(r.precioMensual ?? r.PrecioMensual ?? 0, 0);
+        const estado = r.estado ?? r.Estado ?? false;
         const ultimaRenovacion = r.ultimaRenovacion ?? r.UltimaRenovacion ?? null;
         const expiraISO = addDays(ultimaRenovacion, PLAN_DAYS);
         const daysLeft = daysDiffUTC(expiraISO, nowIso);
@@ -133,7 +148,7 @@ export default function GestionMembresias() {
     if (!isConfirmed) return;
     Swal.fire({ title: "Procesando…", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     try {
-      await renewMembresia(r.idMembresia);
+      await renewMembresia(r.idMembresia); // POST /:id/renew
       await refresh();
       swalToast("success", "Membresía renovada");
     } catch {
@@ -153,7 +168,7 @@ export default function GestionMembresias() {
     if (!isConfirmed) return;
     Swal.fire({ title: "Procesando…", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     try {
-      await softDeleteMembresia(r.idMembresia);
+      await softDeleteMembresia(r.idMembresia); // DELETE /:id
       await refresh();
       swalToast("success", "Membresía dada de baja");
     } catch {
@@ -187,7 +202,7 @@ export default function GestionMembresias() {
     if (!isConfirmed) return;
     Swal.fire({ title: "Creando…", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     try {
-      await createMembershipForBusiness(value.idNegocio, value.precioMensual);
+      await createMembershipForBusiness(value.idNegocio, value.precioMensual); // POST /
       await refresh();
       swalToast("success", "Membresía creada correctamente");
     } catch (e) {
@@ -204,17 +219,22 @@ export default function GestionMembresias() {
     setPrecio(String(r.precioMensual ?? 0));
   }
 
-  async function saveEdit(e) {
-    e.preventDefault();
-    if (!editing) return;
-    await updateMembresia(editing.idMembresia, {
-      precioMensual: Number(precio),
-      idNegocio: editing.idNegocio,
-    });
-    setEditing(null);
-    swalToast("success", "Precio actualizado");
-    await refresh();
-  }
+  // GestionMembresias.jsx -> saveEdit
+async function saveEdit(e) {
+  e.preventDefault();
+  if (!editing) return;
+
+ // GestionMembresias.jsx -> saveEdit
+await updateMembresia(editing.idMembresia, {
+  PrecioMensual: Number(precio),
+  IdNegocio: editing.idNegocio,
+});
+
+
+  setEditing(null);
+  swalToast("success", "Precio actualizado");
+  await refresh();
+}
 
   return (
     <div className="gestion-usuarios-page">
@@ -230,7 +250,11 @@ export default function GestionMembresias() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
-          <select className="nb-input" value={estado} onChange={(e) => setEstado(e.target.value)}>
+          <select
+            className="nb-input"
+            value={estado}
+            onChange={(e) => setEstado(e.target.value)}
+          >
             <option value="todos">Todos</option>
             <option value="activos">Activos</option>
             <option value="inactivos">Inactivos</option>
@@ -259,29 +283,52 @@ export default function GestionMembresias() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="7" className="text-center">Cargando…</td></tr>
+              <tr>
+                <td colSpan="7" className="text-center">Cargando…</td>
+              </tr>
             ) : filtered.length ? (
               filtered.map((r, i) => (
                 <tr key={r.idMembresia ?? i} className={r.expired ? "row-expired" : ""}>
                   <td>{r.nombreNegocio}</td>
-                  <td>${r.precioMensual.toFixed(2)}</td>
+                  <td>{formatMoney(r.precioMensual)}</td>
                   <td>{toLocalDateTime(r.ultimaRenovacion)}</td>
                   <td>{r.expiraISO ? toLocalDateTime(r.expiraISO) : "—"}</td>
                   <td>{r.daysLeft != null ? `${r.daysLeft} días` : "—"}</td>
                   <td>{r.estado ? "Activa" : "Inactiva"}</td>
                   <td>
-                    <button className="nb-btn-small" onClick={() => openEdit(r)}>Editar</button>
-                    <button className="nb-btn-small success" onClick={() => onRenovar(r)}>Renovar</button>
+                    <button className="nb-btn-small danger" onClick={() => openEdit(r)}>
+                      Editar
+                    </button>
+                    <button className="nb-btn-small success" onClick={() => onRenovar(r)}>
+                      Renovar
+                    </button>
+
                     {r.estado && r.expired && (
                       <button className="nb-btn-small danger" onClick={() => onDarDeBaja(r)}>
                         Baja
                       </button>
                     )}
+
+                    {/* Opcional: restaurar cuando está inactiva
+                    {!r.estado && (
+                      <button
+                        className="nb-btn-small"
+                        onClick={async () => {
+                          await restoreMembresia(r.idMembresia);
+                          await refresh();
+                          swalToast("success", "Membresía restaurada");
+                        }}
+                      >
+                        Restaurar
+                      </button>
+                    )} */}
                   </td>
                 </tr>
               ))
             ) : (
-              <tr><td colSpan="7" className="text-center">Sin resultados</td></tr>
+              <tr>
+                <td colSpan="7" className="text-center">Sin resultados</td>
+              </tr>
             )}
           </tbody>
         </table>
@@ -295,14 +342,23 @@ export default function GestionMembresias() {
               <button className="nb-modal-close" onClick={() => setEditing(null)}>✕</button>
             </div>
             <form className="nb-modal-body" onSubmit={saveEdit}>
-              <label>Negocio
+              <label>
+                Negocio
                 <input value={editing.nombreNegocio} disabled />
               </label>
-              <label>Precio mensual
-                <input type="number" step="0.01" value={precio} onChange={(e) => setPrecio(e.target.value)} />
+              <label>
+                Precio mensual
+                <input
+                  type="number"
+                  step="0.01"
+                  value={precio}
+                  onChange={(e) => setPrecio(e.target.value)}
+                />
               </label>
               <div className="nb-modal-footer">
-                <button type="button" className="nb-btn-secondary" onClick={() => setEditing(null)}>Cancelar</button>
+                <button type="button" className="nb-btn-secondary" onClick={() => setEditing(null)}>
+                  Cancelar
+                </button>
                 <button type="submit" className="nb-btn-primary">Guardar</button>
               </div>
             </form>
