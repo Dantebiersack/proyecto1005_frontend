@@ -1,3 +1,4 @@
+// src/pages/Valoraciones.jsx
 import React, { useState, useEffect } from "react";
 import "./Valoraciones.css";
 import {
@@ -9,6 +10,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import { getValoraciones, responderValoracion } from "../../../services/voloracionesService";
 
 export default function Valoraciones() {
   const [valoraciones, setValoraciones] = useState([]);
@@ -17,22 +19,20 @@ export default function Valoraciones() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Obtener valoraciones del backend
+  // ✅ Obtener valoraciones desde el backend
   useEffect(() => {
-    fetch("http://localhost:5128/api/Valoraciones")
-      .then((res) => {
-        if (!res.ok) throw new Error(`Error en la API: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
+    const cargarValoraciones = async () => {
+      try {
+        const data = await getValoraciones();
         setValoraciones(data);
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
         setError("No se pudieron cargar las valoraciones.");
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+    cargarValoraciones();
   }, []);
 
   // Filtrar por calificación
@@ -41,12 +41,18 @@ export default function Valoraciones() {
     : valoraciones;
 
   // Manejar respuesta
-  const handleResponder = (id) => {
+  const handleResponder = async (id) => {
     const resp = respuestas[id];
     if (!resp || resp.trim() === "") return;
-    console.log(`Respuesta a ${id}: ${resp}`);
-    alert(`Respuesta enviada: ${resp}`);
-    setRespuestas({ ...respuestas, [id]: "" });
+
+    try {
+      await responderValoracion(id, resp);
+      alert(`Respuesta enviada: ${resp}`);
+      setRespuestas({ ...respuestas, [id]: "" });
+    } catch (error) {
+      console.error(error);
+      alert("Error al enviar la respuesta");
+    }
   };
 
   // Datos para la gráfica
@@ -95,7 +101,9 @@ export default function Valoraciones() {
           </select>
         </div>
 
-        {valoracionesFiltradas.length === 0 && <p>No hay comentarios con esta calificación.</p>}
+        {valoracionesFiltradas.length === 0 && (
+          <p>No hay comentarios con esta calificación.</p>
+        )}
 
         {valoracionesFiltradas.map((v) => (
           <div key={v.IdValoracion} className="comentario-card">
@@ -118,10 +126,15 @@ export default function Valoraciones() {
                 placeholder="Escribe una respuesta..."
                 value={respuestas[v.IdValoracion] || ""}
                 onChange={(e) =>
-                  setRespuestas({ ...respuestas, [v.IdValoracion]: e.target.value })
+                  setRespuestas({
+                    ...respuestas,
+                    [v.IdValoracion]: e.target.value,
+                  })
                 }
               />
-              <button onClick={() => handleResponder(v.IdValoracion)}>Responder</button>
+              <button onClick={() => handleResponder(v.IdValoracion)}>
+                Responder
+              </button>
             </div>
           </div>
         ))}
