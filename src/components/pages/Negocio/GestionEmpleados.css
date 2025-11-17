@@ -1,0 +1,261 @@
+.gestion-usuarios-page {
+  background: transparent;      
+  width: 100%;
+  padding: 0;   
+  margin-top: 70px;                
+}
+
+/* encabezado */
+.gestion-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.gestion-header h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #0a3d62;
+  margin-bottom: 4px;
+}
+
+.gestion-header p {
+  color: #3f4f66;
+  font-size: 0.9rem;
+}
+
+.gestion-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.nb-input {
+  border: 1px solid #d3d8df;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  outline: none;
+  min-width: 220px;
+}
+.nb-input:focus {
+  border-color: #2d63b4;
+  box-shadow: 0 0 0 2px rgba(45, 99, 180, 0.1);
+}
+
+.nb-btn-primary {
+  background: #3843c2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.nb-btn-primary:hover {
+  background: #2c35a3;
+}
+
+/* card / tabla */
+.gestion-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.gestion-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gestion-table thead {
+  background: #f4f6fb;
+}
+
+.gestion-table th,
+.gestion-table td {
+  padding: 12px 18px;
+  font-size: 0.9rem;
+  color: #1e293b;
+  text-align: left;
+}
+
+.gestion-table tbody tr + tr {
+  border-top: 1px solid #edf0f6;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* badges */
+.badge-role {
+  background: #edf0ff;
+  color: #1c2b59;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.badge-success {
+  background: rgba(0, 166, 90, 0.12);
+  color: #00a65a;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.badge-danger {
+  background: rgba(230, 57, 70, 0.12);
+  color: #e63946;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* acciones */
+.row-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.nb-btn-small {
+  background: #f1f2f6;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.nb-btn-small:hover {
+  background: #e2e5f0;
+}
+
+.nb-btn-small.danger {
+  background: rgba(230, 57, 70, 0.14);
+  color: #e63946;
+}
+.nb-btn-small.danger:hover {
+  background: rgba(230, 57, 70, 0.25);
+}
+
+.nb-btn-small.success {
+  background: rgba(0, 166, 90, 0.14);
+  color: #00a65a;
+}
+.nb-btn-small.success:hover {
+  background: rgba(0, 166, 90, 0.25);
+}
+
+/* modal */
+.nb-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 15, 25, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 90;
+}
+
+.nb-modal {
+  background: #fff;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 420px;
+  padding: 24px 24px 18px;
+  box-shadow: 0 20px 30px rgba(0, 0, 0, 0.18);
+}
+
+.nb-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.nb-modal-header h2 {
+  font-size: 1.1rem;
+  color: #1c2b59;
+  font-weight: 600;
+}
+
+.nb-modal-close {
+  background: #edf0f5;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: #1c2b59;
+}
+
+.nb-modal-body label {
+  display: block;
+  font-size: 0.8rem;
+  color: #1c2b59;
+  margin-bottom: 8px;
+}
+
+.nb-modal-body input,
+.nb-modal-body select {
+  width: 100%;
+  border: 1px solid #d3d8df;
+  border-radius: 8px;
+  padding: 7px 10px;
+  margin-top: 3px;
+  margin-bottom: 12px;
+  outline: none;
+}
+.nb-modal-body input:focus,
+.nb-modal-body select:focus {
+  border-color: #2d63b4;
+  box-shadow: 0 0 0 2px rgba(45, 99, 180, 0.1);
+}
+
+.nb-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.nb-btn-secondary {
+  background: #f1f2f6;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.nb-btn-secondary:hover {
+  background: #e2e4eb;
+}
+
+@media (max-width: 760px) {
+  .gestion-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .gestion-actions {
+    width: 100%;
+  }
+  .gestion-actions .nb-input {
+    flex: 1;
+  }
+  .gestion-table th,
+  .gestion-table td {
+    font-size: 0.75rem;
+  }
+  .row-actions {
+    flex-wrap: wrap;
+  }
+}
