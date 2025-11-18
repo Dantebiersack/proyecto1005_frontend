@@ -5,7 +5,7 @@ import {
   updatePersonal,
   deletePersonal,
   restorePersonal,
-} from "../../../services/PersonalService"; 
+} from "../../../services/personalService"; 
 import {
   getUsuarios, 
   createUsuario,
@@ -34,9 +34,6 @@ export default function GestionEmpleados() {
   const [editing, setEditing] = useState(null); 
   const [formData, setFormData] = useState(FORM_INICIAL);
 
-  // ============================
-  // CARGA INICIAL (Lógica N+1)
-  // ============================
   useEffect(() => {
     if (idNegocio) {
       cargar();
@@ -60,26 +57,26 @@ export default function GestionEmpleados() {
 
       const listaTodosLosUsuarios = await getUsuarios(true);
 
-      // --- 👇 CORRECCIÓN AQUÍ: Normalizamos los datos a camelCase ---
+      
       const empleadosCompletos = listaPersonal.map((personal) => {
         const usuario = listaTodosLosUsuarios.find(u => (u.IdUsuario || u.idUsuario) === personal.IdUsuario);
         
         return {
-          // Datos de Personal (normalizados)
+        
           idPersonal: personal.IdPersonal,
           idUsuario: personal.IdUsuario,
           idNegocio: personal.IdNegocio,
-          rolEnNegocio: personal.RolEnNegocio, // 👈 De PascalCase a camelCase
-          estado: personal.Estado,             // 👈 De PascalCase a camelCase
+          rolEnNegocio: personal.RolEnNegocio, 
+          estado: personal.Estado,             
 
-          // Datos de Usuario (normalizados)
+        
           nombre: usuario?.Nombre || "Usuario no encontrado",
           email: usuario?.Email || "Email no encontrado",
           idRol: usuario?.IdRol, 
           token: usuario?.Token,
         };
       });
-      // --- FIN DE LA CORRECCIÓN ---
+  
 
       setEmpleados(empleadosCompletos);
     } catch (err) {
@@ -107,26 +104,23 @@ export default function GestionEmpleados() {
       nombre: emp.nombre,
       email: emp.email,
       contrasena: "", 
-      rolEnNegocio: emp.rolEnNegocio, // Leemos camelCase
+      rolEnNegocio: emp.rolEnNegocio,
     });
     setShowForm(true);
   }
 
-  // ============================
-  // GUARDAR (Lógica de 2 Pasos)
-  // ============================
   async function handleSubmit(e) {
     e.preventDefault();
     try {
       if (editing) {
         // --- ACTUALIZAR ---
-        await updateUsuario(editing.idUsuario, { // Usamos idUsuario (camelCase)
+        await updateUsuario(editing.idUsuario, { 
           nombre: formData.nombre,
           email: formData.email, 
           idRol: editing.idRol, 
           token: editing.token, 
         });
-        await updatePersonal(editing.idPersonal, { // Usamos idPersonal (camelCase)
+        await updatePersonal(editing.idPersonal, { 
           idUsuario: editing.idUsuario, 
           idNegocio: editing.idNegocio,
           rolEnNegocio: formData.rolEnNegocio,
@@ -134,17 +128,13 @@ export default function GestionEmpleados() {
 
       } else {
         // --- CREAR ---
-        // 1. Crear el Usuario
+        
         const nuevoUsuario = await createUsuario({
           nombre: formData.nombre,
           email: formData.email,
           contrasenaHash: formData.contrasena || "temp123", 
+          idRol: 3, 
           
-          // --- 👇 AQUÍ ESTÁ LA RESPUESTA A TU PREGUNTA ---
-          // El 'idRol' del Usuario se fija en 3 (personal)
-          // y no se le pregunta al admin.
-          idRol: 3, // 👈 3 = 'personal' (según tu script)
-          // --- FIN DE LA RESPUESTA ---
 
           token: null,
         });
@@ -152,8 +142,8 @@ export default function GestionEmpleados() {
         // 2. Vincular el Personal
         await createPersonal({
           idUsuario: nuevoUsuario.IdUsuario, 
-          idNegocio: idNegocio, // El idNegocio del admin (harcodeado a 1)
-          rolEnNegocio: formData.rolEnNegocio, // Este es el texto (ej. "Barbero")
+          idNegocio: idNegocio, 
+          rolEnNegocio: formData.rolEnNegocio, 
         });
       }
       setShowForm(false);
@@ -169,7 +159,7 @@ export default function GestionEmpleados() {
   // ============================
   async function handleDelete(emp) {
     if (!window.confirm(`¿Desactivar a ${emp.nombre}?`)) return;
-    await deletePersonal(emp.idPersonal); // Usamos camelCase
+    await deletePersonal(emp.idPersonal);
     await cargar();
   }
 
@@ -178,7 +168,7 @@ export default function GestionEmpleados() {
   // ============================
   async function handleRestore(emp) {
     if (!window.confirm(`¿Reactivar a ${emp.nombre}?`)) return;
-    await restorePersonal(emp.idPersonal); // Usamos camelCase
+    await restorePersonal(emp.idPersonal); 
     await cargar();
   }
 
@@ -191,7 +181,7 @@ export default function GestionEmpleados() {
     return (
       (emp.nombre || "").toLowerCase().includes(q) ||
       (emp.email || "").toLowerCase().includes(q) ||
-      (emp.rolEnNegocio || "").toLowerCase().includes(q) // Usamos camelCase
+      (emp.rolEnNegocio || "").toLowerCase().includes(q) 
     );
   });
 
@@ -211,8 +201,8 @@ export default function GestionEmpleados() {
   }
 
   return (
-    <div className="gestion-usuarios-page"> {/* Reutiliza CSS */}
-      {/* encabezado */}
+    <div className="gestion-usuarios-page"> 
+      
       <div className="gestion-header">
         <div>
           <h1>Gestión de Empleados</h1>
@@ -232,7 +222,6 @@ export default function GestionEmpleados() {
         </div>
       </div>
 
-      {/* tabla */}
       <div className="gestion-card">
         <table className="gestion-table">
           <thead>
@@ -253,18 +242,18 @@ export default function GestionEmpleados() {
               </tr>
             ) : filtered.length ? (
               filtered.map((emp) => (
-                // --- 👇 CORRECCIÓN: Usamos 'emp.idPersonal' (camelCase) ---
+             
                 <tr key={emp.idPersonal}>
                   <td>{emp.nombre}</td>
                   <td>{emp.email}</td>
                   <td>
                     <span className="badge-role">
-                      {/* --- 👇 CORRECCIÓN: Usamos 'emp.rolEnNegocio' (camelCase) --- */}
+                 
                       {emp.rolEnNegocio}
                     </span>
                   </td>
                   <td>
-                    {/* --- 👇 CORRECCIÓN: Usamos 'emp.estado' (camelCase) --- */}
+                   
                     {emp.estado ? (
                       <span className="badge-success">Activo</span>
                     ) : (
@@ -279,7 +268,7 @@ export default function GestionEmpleados() {
                       >
                         Editar
                       </button>
-                      {/* --- 👇 CORRECCIÓN: Usamos 'emp.estado' (camelCase) --- */}
+                     
                       {emp.estado ? (
                         <button
                           className="nb-btn-small danger"
@@ -310,7 +299,7 @@ export default function GestionEmpleados() {
         </table>
       </div>
 
-      {/* modal */}
+  
       {showForm && (
         <div className="nb-modal-overlay" onClick={() => setShowForm(false)}>
           <div
