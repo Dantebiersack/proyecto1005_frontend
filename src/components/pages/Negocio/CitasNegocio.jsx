@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import {
   listCitas,
+  listCitasByRole,
   createCita,
   updateCita,
   cancelCita,
@@ -23,16 +24,6 @@ function parseTimeOnly(tstr) {
   const [h, m] = (tstr || "00:00").split(":").map(Number);
   const d = new Date();
   d.setHours(h, m, 0, 0);
-  return d;
-}
-function toHHmm(date) {
-  const h = String(date.getHours()).padStart(2, "0");
-  const m = String(date.getMinutes()).padStart(2, "0");
-  return `${h}:${m}`;
-}
-function addMinutes(date, mins) {
-  const d = new Date(date);
-  d.setMinutes(d.getMinutes() + mins);
   return d;
 }
 function safeDateFrom(val) {
@@ -59,7 +50,16 @@ function safeDateFrom(val) {
 
   return null;
 }
-
+function toHHmm(date) {
+  const h = String(date.getHours()).padStart(2, "0");
+  const m = String(date.getMinutes()).padStart(2, "0");
+  return `${h}:${m}`;
+}
+function addMinutes(date, mins) {
+  const d = new Date(date);
+  d.setMinutes(d.getMinutes() + mins);
+  return d;
+}
 function weekdayName(dateVal) {
   var d = safeDateFrom(dateVal);
   if (!d) return "";
@@ -74,9 +74,10 @@ function toLocalDate(dateVal) {
 }
 
 
-export default function GestionCitas({
+export default function CitasNegocio({
   isSuperAdmin = false,
   tecnicoActualId = null,
+  useRoleEndpoint = false,
 }) {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -100,7 +101,12 @@ export default function GestionCitas({
   async function refresh() {
     setLoading(true);
     try {
-      const data = await listCitas();
+      var data;
+      if (useRoleEndpoint) {
+        data = await listCitasByRole();
+      } else {
+        data = await listCitas();
+      }
       const mapped = (data || []).map((x) => ({
         idCita: x.idCita ?? x.IdCita,
         idCliente: x.idCliente ?? x.IdCliente,
@@ -327,7 +333,6 @@ export default function GestionCitas({
       <div className="gestion-header">
         <div>
           <h1>Citas</h1>
-          <p>Aprueba o cancela citas. (Creación solo para probar endpoints)</p>
         </div>
         <div className="gestion-actions">
           <select className="nb-input" value={fEstado} onChange={e => setFEstado(e.target.value)}>
@@ -356,7 +361,6 @@ export default function GestionCitas({
             </select>
           )}
 
-          <button className="nb-btn-primary" onClick={crearDemo}>+ Crear (demo)</button>
         </div>
       </div>
 
