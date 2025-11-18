@@ -7,10 +7,12 @@ import api from "./api";
  * pasar query params para filtrar en el servidor.
  */
 export async function listCitas(params = {}) {
-  // Si decides implementar filtros server-side:
-  // const query = new URLSearchParams(params).toString();
-  // const { data } = await api.get(`/Citas/admin${query ? "?" + query : ""}`);
   const { data } = await api.get(`/Citas`);
+  return data;
+}
+
+export async function listCitasByRole() {
+  const { data } = await api.get("/Citas/by-role");
   return data;
 }
 

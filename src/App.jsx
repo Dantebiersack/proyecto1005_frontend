@@ -8,7 +8,7 @@ import Login from "./components/pages/login.jsx";
 // Negocio
 import MiEmpresa from "./components/pages/Negocio/MiEmpresa.jsx";
 import GestionEmpleados from "./components/pages/Negocio/GestionEmpleados.jsx";
-import Citas from "./components/pages/Negocio/Citas.jsx";
+import Citas from "./components/pages/Negocio/CitasNegocio.jsx";
 import Valoraciones from "./components/pages/Negocio/Valoraciones.jsx";
 import RegistroEmpresa from "./components/pages/Negocio/RegistroEmpresa.jsx";
 
@@ -29,7 +29,7 @@ export default function App() {
 
       <Route path="/login" element={<Login />} />
 
-       <Route path="/registro-empresa" element={<RegistroEmpresa />} />
+      <Route path="/registro-empresa" element={<RegistroEmpresa />} />
 
       <Route element={<PrivateLayout />}>
         {/* Personal */}
@@ -52,7 +52,7 @@ export default function App() {
         <Route
           path="/gestion-membresias"
           element={
-            <RoleGuard allow={["adminNearbiz",]}>
+            <RoleGuard allow={["adminNearbiz"]}>
               <GestionMembresias />
             </RoleGuard>
           }
@@ -91,7 +91,7 @@ export default function App() {
         />
 
         {/* Negocio */}
-       
+
         <Route
           path="/mi-empresa"
           element={
@@ -111,8 +111,12 @@ export default function App() {
         <Route
           path="/citas"
           element={
-            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
-              <Citas />
+            <RoleGuard allow={["adminNegocio", "personal"]}>
+              <Citas
+                isSuperAdmin={false}
+                tecnicoActualId={null}
+                useRoleEndpoint={true}
+              />
             </RoleGuard>
           }
         />

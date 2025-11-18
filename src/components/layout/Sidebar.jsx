@@ -16,6 +16,7 @@ import {
 const sections = [
   {
     title: "Personal NearBiz",
+    requireRole: "adminNearbiz",
     items: [
       {
         to: "/gestion-empresas",
@@ -52,7 +53,7 @@ const sections = [
         label: "Citas",
         roles: ["adminNearbiz"],
         Icon: MdEvent,
-      }
+      },
     ],
   },
   {
@@ -123,29 +124,39 @@ export default function Sidebar({ open, onClose }) {
         </div>
 
         <nav className="nb-sections">
-          {sections.map((sec) => {
-            const visible = sec.items.filter((i) =>
-              i.roles.some((r) => roles.includes(r))
-            );
+          {sections.map(function (sec) {
+            if (sec.requireRole && !roles.includes(sec.requireRole)) {
+              return null;
+            }
+
+            var visible = sec.items.filter(function (i) {
+              return i.roles.some(function (r) {
+                return roles.includes(r);
+              });
+            });
+
             if (!visible.length) return null;
+
             return (
               <div className="nb-section" key={sec.title}>
                 <div className="nb-section-title">{sec.title}</div>
                 <ul>
-                  {visible.map((it) => (
-                    <li key={it.to}>
-                      <NavLink
-                        to={it.to}
-                        className={({ isActive }) =>
-                          "nb-link" + (isActive ? " active" : "")
-                        }
-                        onClick={onClose}
-                      >
-                        {it.Icon && <it.Icon className="nb-icon" size={18} />}
-                        {it.label}
-                      </NavLink>
-                    </li>
-                  ))}
+                  {visible.map(function (it) {
+                    return (
+                      <li key={it.to}>
+                        <NavLink
+                          to={it.to}
+                          className={function ({ isActive }) {
+                            return "nb-link" + (isActive ? " active" : "");
+                          }}
+                          onClick={onClose}
+                        >
+                          {it.Icon && <it.Icon className="nb-icon" size={18} />}
+                          {it.label}
+                        </NavLink>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             );
