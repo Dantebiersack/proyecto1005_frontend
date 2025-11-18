@@ -5,7 +5,7 @@ import {
   updatePersonal,
   deletePersonal,
   restorePersonal,
-} from "../../../services/PersonalService"; 
+} from "../../../services/personalService"; 
 import {
   getUsuarios, 
   createUsuario,
