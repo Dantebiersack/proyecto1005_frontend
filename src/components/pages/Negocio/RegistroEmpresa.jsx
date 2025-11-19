@@ -106,7 +106,7 @@ export default function RegistroEmpresa() {
         Nombre: formData.nombreUsuario,          
         Email: formData.email,               
         ContrasenaHash: formData.contrasena,    
-        IdRol: 3, 
+        IdRol: 2, 
         Token: null,
       };
       
