@@ -10,16 +10,15 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { getValoraciones, responderValoracion } from "../../../services/voloracionesService";
+import { getValoraciones } from "../../../services/voloracionesService";
 
 export default function Valoraciones() {
   const [valoraciones, setValoraciones] = useState([]);
   const [filtro, setFiltro] = useState(0);
-  const [respuestas, setRespuestas] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // ✅ Obtener valoraciones desde el backend
+  // Obtener valoraciones
   useEffect(() => {
     const cargarValoraciones = async () => {
       try {
@@ -35,27 +34,12 @@ export default function Valoraciones() {
     cargarValoraciones();
   }, []);
 
-  // Filtrar por calificación
+  // Filtrar por estrellas
   const valoracionesFiltradas = filtro
     ? valoraciones.filter((v) => v.Calificacion === filtro)
     : valoraciones;
 
-  // Manejar respuesta
-  const handleResponder = async (id) => {
-    const resp = respuestas[id];
-    if (!resp || resp.trim() === "") return;
-
-    try {
-      await responderValoracion(id, resp);
-      alert(`Respuesta enviada: ${resp}`);
-      setRespuestas({ ...respuestas, [id]: "" });
-    } catch (error) {
-      console.error(error);
-      alert("Error al enviar la respuesta");
-    }
-  };
-
-  // Datos para la gráfica
+  // Datos para gráfica
   const dataGrafica = [5, 4, 3, 2, 1].map((star) => ({
     name: `${star}⭐`,
     comentarios: valoraciones.filter((v) => v.Calificacion === star).length,
@@ -71,7 +55,7 @@ export default function Valoraciones() {
         : "#f44336",
   }));
 
-  // Promedio de calificación
+  // Promedio
   const totalComentarios = valoraciones.length;
   const promedio =
     totalComentarios > 0
@@ -119,23 +103,6 @@ export default function Valoraciones() {
               </div>
             </div>
             <p className="comentario">{v.Comentario || "(Sin comentario)"}</p>
-
-            <div className="responder">
-              <input
-                type="text"
-                placeholder="Escribe una respuesta..."
-                value={respuestas[v.IdValoracion] || ""}
-                onChange={(e) =>
-                  setRespuestas({
-                    ...respuestas,
-                    [v.IdValoracion]: e.target.value,
-                  })
-                }
-              />
-              <button onClick={() => handleResponder(v.IdValoracion)}>
-                Responder
-              </button>
-            </div>
           </div>
         ))}
       </div>

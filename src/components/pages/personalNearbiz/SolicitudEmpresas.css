@@ -1,0 +1,110 @@
+.solicitudes-container {
+  padding: 24px;
+  max-width: 850px;
+  margin: 0 auto;
+  animation: fadeIn 0.3s ease;
+}
+
+.solicitud-card {
+  background: #ffffff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-left: 6px solid #4caf50;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.solicitud-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.solicitud-card h3 {
+  margin: 0 0 10px;
+  font-weight: 600;
+  color: #333;
+}
+
+.acciones {
+  margin-top: 14px;
+  display: flex;
+  gap: 12px;
+}
+
+.btn-aprobar,
+.btn-rechazar {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s ease;
+}
+
+.btn-aprobar {
+  background: #2e7d32;
+}
+
+.btn-aprobar:hover {
+  background: #1b5e20;
+}
+
+.btn-rechazar {
+  background: #c62828;
+}
+
+.btn-rechazar:hover {
+  background: #8e0000;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  background: white;
+  padding: 22px;
+  width: 380px;
+  border-radius: 14px;
+  animation: slideUp 0.25s ease;
+}
+
+.modal textarea {
+  width: 100%;
+  height: 110px;
+  resize: none;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.modal-buttons {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(15px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
