@@ -18,11 +18,14 @@ export default function Valoraciones() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Obtener valoraciones
+  // 🚨 TEMPORAL: ID del negocio (luego lo traemos dinámico)
+  const negocioId = 1;
+
+  // Obtener valoraciones del negocio
   useEffect(() => {
     const cargarValoraciones = async () => {
       try {
-        const data = await getValoraciones();
+        const data = await getValoraciones(negocioId);
         setValoraciones(data);
       } catch (err) {
         console.error(err);
@@ -32,7 +35,7 @@ export default function Valoraciones() {
       }
     };
     cargarValoraciones();
-  }, []);
+  }, [negocioId]);
 
   // Filtrar por estrellas
   const valoracionesFiltradas = filtro
