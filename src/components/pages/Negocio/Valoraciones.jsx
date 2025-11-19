@@ -1,4 +1,3 @@
-// src/pages/Valoraciones.jsx
 import React, { useState, useEffect } from "react";
 import "./Valoraciones.css";
 import {
@@ -10,7 +9,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { getValoraciones } from "../../../services/voloracionesService";
+import { getValoraciones } from "../../../services/valoracionesService";
 
 export default function Valoraciones() {
   const [valoraciones, setValoraciones] = useState([]);
@@ -18,7 +17,7 @@ export default function Valoraciones() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // 🚨 TEMPORAL: ID del negocio (luego lo traemos dinámico)
+  // 🚨 TEMPORAL: ID del negocio (luego dinámico)
   const negocioId = 1;
 
   // Obtener valoraciones del negocio
@@ -95,7 +94,7 @@ export default function Valoraciones() {
         {valoracionesFiltradas.map((v) => (
           <div key={v.IdValoracion} className="comentario-card">
             <div className="header-comentario">
-              <span className="cliente-nombre">Cliente #{v.IdCliente}</span>
+              <span className="cliente-nombre">{v.NombreCliente || `Cliente #${v.IdCliente}`}</span>
               <div className="estrellas">
                 {Array.from({ length: v.Calificacion }).map((_, i) => (
                   <span key={`star-filled-${v.IdValoracion}-${i}`}>★</span>

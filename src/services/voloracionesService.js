@@ -1,4 +1,3 @@
-// src/services/valoracionesService.js
 import api from "./api";
 
 // Obtener valoraciones por negocio
@@ -22,5 +21,3 @@ export const responderValoracion = async (id, respuesta) => {
     throw error;
   }
 };
-
-
