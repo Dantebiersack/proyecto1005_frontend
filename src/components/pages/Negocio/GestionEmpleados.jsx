@@ -7,7 +7,6 @@ import {
   restorePersonal,
 } from "../../../services/personalService"; 
 import {
-  getUsuarios, 
   createUsuario,
   updateUsuario,
 } from "../../../services/usersService"; 
@@ -23,9 +22,7 @@ const FORM_INICIAL = {
 };
 
 export default function GestionEmpleados() {
-  const { user } = useAuth();
-  
-  const idNegocio = 1;
+  const { user } = useAuth(); 
 
   const [empleados, setEmpleados] = useState([]); 
   const [loading, setLoading] = useState(true);
@@ -34,51 +31,34 @@ export default function GestionEmpleados() {
   const [editing, setEditing] = useState(null); 
   const [formData, setFormData] = useState(FORM_INICIAL);
 
+
   useEffect(() => {
-    if (idNegocio) {
-      cargar();
-    } else {
-      setLoading(false);
-      console.error("No se encontró idNegocio en el contexto de autenticación.");
-    }
-  }, [idNegocio]);
+    cargar();
+  }, []);
 
   async function cargar() {
     try {
       setLoading(true);
       
-      const listaPersonal = await getPersonal(true, idNegocio); 
+      const data = await getPersonal(true); 
       
-      if (!listaPersonal || listaPersonal.length === 0) {
+      if (!data) {
         setEmpleados([]); 
-        setLoading(false);
         return;
       }
 
-      const listaTodosLosUsuarios = await getUsuarios(true);
+      const normalizados = data.map((emp) => ({
+        idPersonal: emp.IdPersonal,
+        idUsuario: emp.IdUsuario,
+        idNegocio: emp.IdNegocio,
+        rolEnNegocio: emp.RolEnNegocio,
+        estado: emp.Estado,
+        nombre: emp.Nombre,
+        email: emp.Email,  
+        token: null, 
+      }));
 
-      
-      const empleadosCompletos = listaPersonal.map((personal) => {
-        const usuario = listaTodosLosUsuarios.find(u => (u.IdUsuario || u.idUsuario) === personal.IdUsuario);
-        
-        return {
-        
-          idPersonal: personal.IdPersonal,
-          idUsuario: personal.IdUsuario,
-          idNegocio: personal.IdNegocio,
-          rolEnNegocio: personal.RolEnNegocio, 
-          estado: personal.Estado,             
-
-        
-          nombre: usuario?.Nombre || "Usuario no encontrado",
-          email: usuario?.Email || "Email no encontrado",
-          idRol: usuario?.IdRol, 
-          token: usuario?.Token,
-        };
-      });
-  
-
-      setEmpleados(empleadosCompletos);
+      setEmpleados(normalizados);
     } catch (err) {
       console.error("Error cargando empleados", err);
     } finally {
@@ -86,18 +66,12 @@ export default function GestionEmpleados() {
     }
   }
 
-  // ============================
-  // ABRIR ALTA
-  // ============================
   function openNew() {
     setEditing(null);
     setFormData(FORM_INICIAL);
     setShowForm(true);
   }
 
-  // ============================
-  // ABRIR EDICIÓN
-  // ============================
   function openEdit(emp) {
     setEditing(emp);
     setFormData({
@@ -113,37 +87,31 @@ export default function GestionEmpleados() {
     e.preventDefault();
     try {
       if (editing) {
-        // --- ACTUALIZAR ---
-        await updateUsuario(editing.idUsuario, { 
-          nombre: formData.nombre,
-          email: formData.email, 
-          idRol: editing.idRol, 
-          token: editing.token, 
+      
+        await updateUsuario(editing.idUsuario, {
+          Nombre: formData.nombre,
+          Email: formData.email, 
+          IdRol: 3, 
         });
-        await updatePersonal(editing.idPersonal, { 
-          idUsuario: editing.idUsuario, 
-          idNegocio: editing.idNegocio,
-          rolEnNegocio: formData.rolEnNegocio,
+        await updatePersonal(editing.idPersonal, {
+          IdUsuario: editing.idUsuario, 
+          RolEnNegocio: formData.rolEnNegocio,
         });
 
       } else {
-        // --- CREAR ---
-        
+       
         const nuevoUsuario = await createUsuario({
-          nombre: formData.nombre,
-          email: formData.email,
-          contrasenaHash: formData.contrasena || "temp123", 
-          idRol: 3, 
-          
-
-          token: null,
+          Nombre: formData.nombre,
+          Email: formData.email,
+          ContrasenaHash: formData.contrasena || "temp123", 
+          IdRol: 3, 
+          Token: null,
         });
         
-        // 2. Vincular el Personal
+       
         await createPersonal({
-          idUsuario: nuevoUsuario.IdUsuario, 
-          idNegocio: idNegocio, 
-          rolEnNegocio: formData.rolEnNegocio, 
+          IdUsuario: nuevoUsuario.IdUsuario, 
+          RolEnNegocio: formData.rolEnNegocio,
         });
       }
       setShowForm(false);
@@ -154,55 +122,32 @@ export default function GestionEmpleados() {
     }
   }
 
-  // ============================
-  // DESACTIVAR
-  // ============================
+
   async function handleDelete(emp) {
     if (!window.confirm(`¿Desactivar a ${emp.nombre}?`)) return;
     await deletePersonal(emp.idPersonal);
     await cargar();
   }
 
-  // ============================
-  // ACTIVAR
-  // ============================
   async function handleRestore(emp) {
     if (!window.confirm(`¿Reactivar a ${emp.nombre}?`)) return;
-    await restorePersonal(emp.idPersonal); 
+    await restorePersonal(emp.idPersonal);
     await cargar();
   }
 
-  // ============================
-  // FILTRO
-  // ============================
+ 
   const filtered = empleados.filter((emp) => {
     if (!search.trim()) return true;
     const q = search.toLowerCase();
     return (
       (emp.nombre || "").toLowerCase().includes(q) ||
       (emp.email || "").toLowerCase().includes(q) ||
-      (emp.rolEnNegocio || "").toLowerCase().includes(q) 
+      (emp.rolEnNegocio || "").toLowerCase().includes(q)
     );
   });
 
-  // ============================
-  // RENDER (Adaptado de GestionUsuarios)
-  // ============================
-
-  if (!idNegocio) {
-    return (
-      <div className="gestion-usuarios-page">
-        <div className="gestion-header">
-          <h1>Error de Permisos</h1>
-          <p>No estás asociado a ningún negocio. Tu usuario debe ser "Admin de negocio" para ver esta página.</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="gestion-usuarios-page"> 
-      
+    <div className="gestion-usuarios-page">
       <div className="gestion-header">
         <div>
           <h1>Gestión de Empleados</h1>
@@ -236,24 +181,15 @@ export default function GestionEmpleados() {
           <tbody>
             {loading ? (
               <tr key="loading-row">
-                <td colSpan="5" className="text-center">
-                  Cargando...
-                </td>
+                <td colSpan="5" className="text-center">Cargando...</td>
               </tr>
             ) : filtered.length ? (
               filtered.map((emp) => (
-             
                 <tr key={emp.idPersonal}>
                   <td>{emp.nombre}</td>
                   <td>{emp.email}</td>
+                  <td><span className="badge-role">{emp.rolEnNegocio}</span></td>
                   <td>
-                    <span className="badge-role">
-                 
-                      {emp.rolEnNegocio}
-                    </span>
-                  </td>
-                  <td>
-                   
                     {emp.estado ? (
                       <span className="badge-success">Activo</span>
                     ) : (
@@ -262,27 +198,11 @@ export default function GestionEmpleados() {
                   </td>
                   <td>
                     <div className="row-actions">
-                      <button
-                        className="nb-btn-small"
-                        onClick={() => openEdit(emp)}
-                      >
-                        Editar
-                      </button>
-                     
+                      <button className="nb-btn-small" onClick={() => openEdit(emp)}>Editar</button>
                       {emp.estado ? (
-                        <button
-                          className="nb-btn-small danger"
-                          onClick={() => handleDelete(emp)}
-                        >
-                          Desactivar
-                        </button>
+                        <button className="nb-btn-small danger" onClick={() => handleDelete(emp)}>Desactivar</button>
                       ) : (
-                        <button
-                          className="nb-btn-small success"
-                          onClick={() => handleRestore(emp)}
-                        >
-                          Activar
-                        </button>
+                        <button className="nb-btn-small success" onClick={() => handleRestore(emp)}>Activar</button>
                       )}
                     </div>
                   </td>
@@ -290,32 +210,19 @@ export default function GestionEmpleados() {
               ))
             ) : (
               <tr key="empty-row">
-                <td colSpan="5" className="text-center">
-                  No se encontraron empleados.
-                </td>
+                <td colSpan="5" className="text-center">No se encontraron empleados.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
 
-  
       {showForm && (
         <div className="nb-modal-overlay" onClick={() => setShowForm(false)}>
-          <div
-            className="nb-modal"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-          >
+          <div className="nb-modal" onClick={(e) => e.stopPropagation()}>
             <div className="nb-modal-header">
               <h2>{editing ? "Editar Empleado" : "Nuevo Empleado"}</h2>
-              <button
-                className="nb-modal-close"
-                onClick={() => setShowForm(false)}
-              >
-                ✕
-              </button>
+              <button className="nb-modal-close" onClick={() => setShowForm(false)}>✕</button>
             </div>
 
             <form className="nb-modal-body" onSubmit={handleSubmit}>
@@ -323,9 +230,7 @@ export default function GestionEmpleados() {
                 Nombre
                 <input
                   value={formData.nombre}
-                  onChange={(e) =>
-                    setFormData((f) => ({ ...f, nombre: e.target.value }))
-                  }
+                  onChange={(e) => setFormData((f) => ({ ...f, nombre: e.target.value }))}
                   required
                 />
               </label>
@@ -335,10 +240,9 @@ export default function GestionEmpleados() {
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData((f) => ({ ...f, email: e.target.value }))
-                  }
+                  onChange={(e) => setFormData((f) => ({ ...f, email: e.target.value }))}
                   required
+                
                 />
               </label>
 
@@ -348,14 +252,9 @@ export default function GestionEmpleados() {
                   <input
                     type="password"
                     value={formData.contrasena}
-                    onChange={(e) =>
-                      setFormData((f) => ({
-                        ...f,
-                        contrasena: e.target.value,
-                      }))
-                    }
-                    placeholder={editing ? "(No se cambia)" : "mín. 6 caracteres"}
-                    required={!editing} 
+                    onChange={(e) => setFormData((f) => ({ ...f, contrasena: e.target.value }))}
+                    placeholder="mín. 6 caracteres"
+                    required
                   />
                 </label>
               )}
@@ -363,30 +262,16 @@ export default function GestionEmpleados() {
               <label>
                 Rol en Negocio
                 <input
-                  type="text"
                   value={formData.rolEnNegocio}
-                  onChange={(e) =>
-                    setFormData((f) => ({
-                      ...f,
-                      rolEnNegocio: e.target.value,
-                    }))
-                  }
+                  onChange={(e) => setFormData((f) => ({ ...f, rolEnNegocio: e.target.value }))}
                   placeholder="Ej: Estilista, Barbero"
                   required
                 />
               </label>
 
               <div className="nb-modal-footer">
-                <button
-                  type="button"
-                  className="nb-btn-secondary"
-                  onClick={() => setShowForm(false)}
-                >
-                  Cancelar
-                </button>
-                <button type="submit" className="nb-btn-primary">
-                  Guardar
-                </button>
+                <button type="button" className="nb-btn-secondary" onClick={() => setShowForm(false)}>Cancelar</button>
+                <button type="submit" className="nb-btn-primary">Guardar</button>
               </div>
             </form>
           </div>
