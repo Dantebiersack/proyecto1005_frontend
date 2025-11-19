@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../services/api";
 import NavbarInicio from "../../Navbar/NavbarInicio";
-import { uploadImage } from "../../../services/storageService"; // 👈 IMPORTANTE
+import { uploadImage } from "../../../services/storageService"; 
 import "./RegistroEmpresa.css";
 
 export default function RegistroEmpresa() {
   const navigate = useNavigate();
+
 
   const [formData, setFormData] = useState({
     // Usuario
@@ -14,7 +15,7 @@ export default function RegistroEmpresa() {
     email: "",
     contrasena: "",
 
-    // Negocio
+  
     nombreNegocio: "",
     idCategoria: "",
     direccion: "",
@@ -22,7 +23,7 @@ export default function RegistroEmpresa() {
     telefonoContacto: "",
     correoContacto: "",
     horarioAtencion: "",
-    linkUrl: "", // aquí guardaremos la URL pública de Supabase
+    linkUrl: "", 
     coordenadasLat: 21.1165,
     coordenadasLng: -101.6696,
     idMembresia: null,
@@ -32,13 +33,14 @@ export default function RegistroEmpresa() {
   const [loadingCategorias, setLoadingCategorias] = useState(true);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false); // 👈 para mostrar "subiendo..."
+  const [uploading, setUploading] = useState(false);
 
-  // Cargar categorías
+
   useEffect(() => {
     const cargarCategorias = async () => {
       try {
         setLoadingCategorias(true);
+       
         const response = await api.get("/Categorias");
         setCategorias(response.data);
       } catch (err) {
@@ -51,6 +53,7 @@ export default function RegistroEmpresa() {
     cargarCategorias();
   }, []);
 
+ 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -59,7 +62,7 @@ export default function RegistroEmpresa() {
     }));
   };
 
-  // 👇 NUEVO: cuando seleccionan archivo
+ 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -67,10 +70,7 @@ export default function RegistroEmpresa() {
     setUploading(true);
     setError(null);
     try {
-      // subimos a supabase, carpeta "negocios"
       const { publicUrl } = await uploadImage(file, "negocios");
-
-      // guardamos la URL en el form
       setFormData((prev) => ({
         ...prev,
         linkUrl: publicUrl,
@@ -83,7 +83,7 @@ export default function RegistroEmpresa() {
     }
   };
 
-  // Lógica de envío
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -101,63 +101,57 @@ export default function RegistroEmpresa() {
     }
 
     try {
-      // 1) Crear el Usuario (Dueño)
+  
       const usuarioDto = {
-        nombre: formData.nombreUsuario,
-        email: formData.email,
-        contrasenaHash: formData.contrasena, // ya luego la hasheas en back
-        idRol: 3, // admin de negocio
-        token: null,
+        Nombre: formData.nombreUsuario,          
+        Email: formData.email,               
+        ContrasenaHash: formData.contrasena,    
+        IdRol: 3, 
+        Token: null,
       };
+      
       const responseUsuario = await api.post("/Usuarios", usuarioDto);
       const idUsuarioCreado = responseUsuario.data.IdUsuario;
 
-      // 2) Crear el Negocio
+     
       const negocioDto = {
-        idCategoria: parseInt(formData.idCategoria),
-        idMembresia: formData.idMembresia,
-        nombre: formData.nombreNegocio,
-        direccion: formData.direccion,
-        coordenadasLat: parseFloat(formData.coordenadasLat),
-        coordenadasLng: parseFloat(formData.coordenadasLng),
-        descripcion: formData.descripcion,
-        telefonoContacto: formData.telefonoContacto,
-        correoContacto: formData.correoContacto,
-        horarioAtencion: formData.horarioAtencion,
-        linkUrl: formData.linkUrl, // 👈 ya viene de supabase
+        IdCategoria: parseInt(formData.idCategoria),
+        IdMembresia: formData.idMembresia,
+        Nombre: formData.nombreNegocio,
+        Direccion: formData.direccion,
+        CoordenadasLat: parseFloat(formData.coordenadasLat),
+        CoordenadasLng: parseFloat(formData.coordenadasLng),
+        Descripcion: formData.descripcion,
+        TelefonoContacto: formData.telefonoContacto,
+        CorreoContacto: formData.correoContacto,
+        HorarioAtencion: formData.horarioAtencion,
+        LinkUrl: formData.linkUrl,
       };
+      
       const responseNegocio = await api.post("/Negocios", negocioDto);
       const idNegocioCreado = responseNegocio.data.IdNegocio;
 
       if (!idUsuarioCreado || !idNegocioCreado) {
-        console.error(
-          "Respuesta de API inesperada:",
-          responseUsuario.data,
-          responseNegocio.data
-        );
-        throw new Error(
-          "No se pudo obtener el ID del usuario o del negocio desde la API."
-        );
+        throw new Error("Error: No se obtuvieron los IDs del servidor.");
       }
 
-      // 3) Vincular (POST /Personal)
+    
       const personalDto = {
-        idUsuario: idUsuarioCreado,
-        idNegocio: idNegocioCreado,
-        rolEnNegocio: "Administrador",
+        IdUsuario: idUsuarioCreado,
+        IdNegocio: idNegocioCreado,
+        RolEnNegocio: "Administrador",
       };
+      
       await api.post("/Personal", personalDto);
 
+     
       setLoading(false);
-      alert(
-        "¡Registro enviado exitosamente! Su solicitud será revisada por un administrador."
-      );
-      navigate("/");
+      alert("¡Registro enviado exitosamente! Su solicitud será revisada.");
+      navigate("/"); 
+
     } catch (err) {
       console.error(err);
-      setError(
-        "Error en el registro. " + (err.response?.data?.error || err.message)
-      );
+      setError("Error en el registro. " + (err.response?.data?.message || err.message));
       setLoading(false);
     }
   };
@@ -168,13 +162,11 @@ export default function RegistroEmpresa() {
       <div className="register-wrapper">
         <div className="register-card">
           <h1>Registra tu Negocio</h1>
-          <p>
-            Crea tu cuenta de administrador y registra tu negocio al mismo
-            tiempo.
-          </p>
+          <p>Crea tu cuenta de administrador y registra tu negocio al mismo tiempo.</p>
 
           <form onSubmit={handleSubmit} className="register-form">
-            {/* SECCIÓN DE USUARIO*/}
+            
+            {/* --- USUARIO --- */}
             <fieldset>
               <legend>Datos del Administrador</legend>
               <div className="form-group">
@@ -200,9 +192,7 @@ export default function RegistroEmpresa() {
                 />
               </div>
               <div className="form-group span-2">
-                <label htmlFor="contrasena">
-                  Tu Contraseña (mín. 6 caracteres)
-                </label>
+                <label htmlFor="contrasena">Tu Contraseña (mín. 6 caracteres)</label>
                 <input
                   type="password"
                   id="contrasena"
@@ -214,7 +204,7 @@ export default function RegistroEmpresa() {
               </div>
             </fieldset>
 
-            {/* SECCIÓN DE NEGOCIO*/}
+            {/* --- NEGOCIO --- */}
             <fieldset>
               <legend>Datos del Negocio</legend>
               <div className="form-group span-2">
@@ -223,16 +213,17 @@ export default function RegistroEmpresa() {
                   type="text"
                   id="nombreNegocio"
                   name="nombreNegocio"
-                  placeholder="El nombre de tu negocio"
+                  placeholder="Ej: Barbería El Rey"
                   value={formData.nombreNegocio}
                   onChange={handleChange}
                   required
                 />
               </div>
+              
               <div className="form-group">
-                <label htmlFor="idCategoria">Categoría del Negocio</label>
+                <label htmlFor="idCategoria">Categoría</label>
                 {loadingCategorias ? (
-                  <p>Cargando categorías...</p>
+                  <p style={{fontSize: "0.9rem", color: "#666"}}>Cargando categorías...</p>
                 ) : (
                   <select
                     id="idCategoria"
@@ -243,6 +234,7 @@ export default function RegistroEmpresa() {
                   >
                     <option value="">-- Seleccione una categoría --</option>
                     {categorias.map((cat) => (
+                      // Usamos PascalCase porque así vienen de la API
                       <option key={cat.IdCategoria} value={cat.IdCategoria}>
                         {cat.NombreCategoria}
                       </option>
@@ -250,51 +242,54 @@ export default function RegistroEmpresa() {
                   </select>
                 )}
               </div>
+
               <div className="form-group">
-                <label htmlFor="telefonoContacto">Teléfono de Contacto</label>
+                <label htmlFor="telefonoContacto">Teléfono</label>
                 <input
                   type="tel"
                   id="telefonoContacto"
                   name="telefonoContacto"
-                  placeholder="Coloca tu numero para contactarte"
+                  placeholder="Ej: 477 123 4567"
                   value={formData.telefonoContacto}
                   onChange={handleChange}
                 />
               </div>
+
               <div className="form-group span-2">
                 <label htmlFor="direccion">Dirección</label>
                 <input
                   type="text"
                   id="direccion"
                   name="direccion"
-                  placeholder="Coloca la direccion del establecimiento"
                   value={formData.direccion}
                   onChange={handleChange}
                 />
               </div>
+
               <div className="form-group span-2">
-                <label htmlFor="descripcion">Descripción breve</label>
+                <label htmlFor="descripcion">Descripción</label>
                 <textarea
                   id="descripcion"
                   name="descripcion"
-                  placeholder="Coloca una descripcion"
+                  placeholder="Describe tus servicios..."
                   value={formData.descripcion}
                   onChange={handleChange}
                 />
               </div>
+
               <div className="form-group">
                 <label htmlFor="correoContacto">Email de Contacto</label>
                 <input
                   type="email"
                   id="correoContacto"
                   name="correoContacto"
-                  placeholder="Contacto email"
                   value={formData.correoContacto}
                   onChange={handleChange}
                 />
               </div>
+
               <div className="form-group">
-                <label htmlFor="horarioAtencion">Horario de Atención</label>
+                <label htmlFor="horarioAtencion">Horario</label>
                 <input
                   type="text"
                   id="horarioAtencion"
@@ -305,9 +300,8 @@ export default function RegistroEmpresa() {
                 />
               </div>
 
-              {/* coordenadas */}
               <div className="form-group">
-                <label htmlFor="coordenadasLat">Latitud (Opcional)</label>
+                <label htmlFor="coordenadasLat">Latitud</label>
                 <input
                   type="number"
                   id="coordenadasLat"
@@ -315,11 +309,11 @@ export default function RegistroEmpresa() {
                   value={formData.coordenadasLat}
                   onChange={handleChange}
                   step="any"
-                  placeholder="Ej: 21.1165"
                 />
               </div>
+
               <div className="form-group">
-                <label htmlFor="coordenadasLng">Longitud (Opcional)</label>
+                <label htmlFor="coordenadasLng">Longitud</label>
                 <input
                   type="number"
                   id="coordenadasLng"
@@ -327,56 +321,41 @@ export default function RegistroEmpresa() {
                   value={formData.coordenadasLng}
                   onChange={handleChange}
                   step="any"
-                  placeholder="Ej: -101.6696"
                 />
               </div>
 
-              {/* 👇 AQUÍ ADAPTAMOS EL linkUrl */}
               <div className="form-group span-2">
-                <label htmlFor="linkUrl">
-                  Imagen (logo / foto del negocio)
-                </label>
-
-                {/* input de archivo */}
+                <label htmlFor="fileInput">Imagen del Negocio</label>
                 <input
                   type="file"
+                  id="fileInput"
                   accept="image/*"
                   onChange={handleFileChange}
                   disabled={uploading}
+                  style={{ marginBottom: "8px" }}
                 />
-
-                {/* input de texto por si quieres pegar una URL ya hosteada */}
+                {uploading && <small style={{ color: "#3843c2" }}>Subiendo imagen...</small>}
+                
                 <input
                   type="text"
                   id="linkUrl"
                   name="linkUrl"
-                  placeholder="O pega aquí una URL ya pública"
+                  placeholder="URL de la imagen"
                   value={formData.linkUrl}
                   onChange={handleChange}
-                  style={{ marginTop: "6px" }}
+                  readOnly
+                  style={{ backgroundColor: "#f0f0f0", color: "#555" }}
                 />
 
-                {uploading && (
-                  <small style={{ color: "#3843c2" }}>
-                    Subiendo imagen a Supabase...
-                  </small>
-                )}
-
-                {formData.linkUrl ? (
-                  <div style={{ marginTop: "8px" }}>
+                {formData.linkUrl && (
+                  <div style={{ marginTop: "10px", textAlign: "center" }}>
                     <img
                       src={formData.linkUrl}
-                      alt="preview negocio"
-                      style={{
-                        width: "140px",
-                        height: "140px",
-                        objectFit: "cover",
-                        borderRadius: "12px",
-                        border: "1px solid #ddd",
-                      }}
+                      alt="Vista previa"
+                      style={{ width: "100%", maxWidth: "200px", borderRadius: "8px" }}
                     />
                   </div>
-                ) : null}
+                )}
               </div>
             </fieldset>
 
@@ -387,7 +366,7 @@ export default function RegistroEmpresa() {
               className="btn-submit-registro"
               disabled={loading || loadingCategorias || uploading}
             >
-              {loading ? "Enviando Registro..." : "Enviar Registro para Validación"}
+              {loading ? "Registrando..." : "Registrar mi Negocio"}
             </button>
           </form>
         </div>

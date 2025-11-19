@@ -6,12 +6,12 @@ import {
   deleteNegocio,
   restoreNegocio,
 } from "../../../services/negociosService";
-import api from "../../../services/api";
+import api from "../../../services/api"; // Para cargar categorías directamente
 import { useAuth } from "../../../auth/AuthContext";
-import "./GestionUsuarios.css"; 
+import "./GestionUsuarios.css"; // 👈 Reutilizamos el CSS existente
 import { FaPlus } from "react-icons/fa";
 
-
+// Estado inicial del formulario
 const FORM_INICIAL = {
   nombre: "",
   idCategoria: "",
@@ -46,10 +46,10 @@ export default function GestionEmpresas() {
     try {
       setLoading(true);
       
-    
+     
       const [listaNegocios, listaCategorias] = await Promise.all([
-        getNegocios(true),
-        api.get("/Categorias").then(res => res.data)
+        getNegocios(true), 
+        api.get("/Categorias").then(res => res.data) 
       ]);
 
       setNegocios(listaNegocios);
@@ -62,12 +62,13 @@ export default function GestionEmpresas() {
     }
   }
 
+ 
   const getNombreCategoria = (id) => {
     const cat = categorias.find(c => c.IdCategoria === id);
     return cat ? cat.NombreCategoria : "Sin categoría";
   };
 
- 
+
   function openNew() {
     setEditing(null);
     setFormData(FORM_INICIAL);
@@ -76,7 +77,7 @@ export default function GestionEmpresas() {
 
   function openEdit(negocio) {
     setEditing(negocio);
- 
+
     setFormData({
       nombre: negocio.Nombre,
       idCategoria: negocio.IdCategoria,
@@ -92,11 +93,13 @@ export default function GestionEmpresas() {
     setShowForm(true);
   }
 
-
+  // ============================
+  // GUARDAR
+  // ============================
   async function handleSubmit(e) {
     e.preventDefault();
     
-    
+   
     const dto = {
       Nombre: formData.nombre,
       IdCategoria: parseInt(formData.idCategoria),
@@ -125,7 +128,9 @@ export default function GestionEmpresas() {
     }
   }
 
-  
+  // ============================
+  // ELIMINAR / RESTAURAR
+  // ============================
   async function handleDelete(negocio) {
     if (!window.confirm(`¿Desactivar el negocio "${negocio.Nombre}"?`)) return;
     await deleteNegocio(negocio.IdNegocio);
@@ -138,7 +143,9 @@ export default function GestionEmpresas() {
     await cargarDatos();
   }
 
- 
+  // ============================
+  // FILTRO
+  // ============================
   const filtered = negocios.filter((n) => {
     if (!search.trim()) return true;
     const q = search.toLowerCase();
@@ -148,8 +155,11 @@ export default function GestionEmpresas() {
     );
   });
 
+  // ============================
+  // RENDER
+  // ============================
   return (
-    <div className="gestion-usuarios-page">
+    <div className="gestion-usuarios-page"> 
       
       <div className="gestion-header">
         <div>
