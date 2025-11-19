@@ -37,7 +37,7 @@ export default function Login() {
           <div className="login-left">
             <div className="logo-content">
               <img
-                src="https://i.pinimg.com/736x/3b/d8/f6/3bd8f650d3ec2b5a943f441560de65a4.jpg"
+                src="../../assets/nearBizLogo.jpg"
                 alt="NearBiz Logo"
                 className="login-logo"
               />
