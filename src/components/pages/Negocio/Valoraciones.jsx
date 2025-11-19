@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { getValoraciones } from "../../../services/valoracionesService";
+import { getValoraciones } from "../../../services/voloracionesService";
 
 export default function Valoraciones() {
   const [valoraciones, setValoraciones] = useState([]);
