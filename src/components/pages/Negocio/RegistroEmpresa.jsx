@@ -2,45 +2,60 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../services/api";
 import NavbarInicio from "../../Navbar/NavbarInicio";
-import { uploadImage } from "../../../services/storageService"; 
+import { uploadImage } from "../../../services/storageService";
+import { FaCalendarAlt, FaClock } from "react-icons/fa"; 
 import "./RegistroEmpresa.css";
+
+const DIAS_SEMANA = [
+  "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"
+];
+
+const HORARIO_INICIAL = DIAS_SEMANA.map(dia => ({
+  dia: dia,
+  activo: false, 
+  inicio: "09:00",
+  fin: "18:00"
+}));
 
 export default function RegistroEmpresa() {
   const navigate = useNavigate();
-
 
   const [formData, setFormData] = useState({
     // Usuario
     nombreUsuario: "",
     email: "",
     contrasena: "",
-
-  
+    
+    // Negocio
     nombreNegocio: "",
     idCategoria: "",
     direccion: "",
     descripcion: "",
     telefonoContacto: "",
     correoContacto: "",
-    horarioAtencion: "",
-    linkUrl: "", 
+   
+    linkUrl: "",
     coordenadasLat: 21.1165,
     coordenadasLng: -101.6696,
     idMembresia: null,
   });
 
+  // Estados del Horario
+  const [horario, setHorario] = useState(HORARIO_INICIAL);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+
+  // Estados generales
   const [categorias, setCategorias] = useState([]);
   const [loadingCategorias, setLoadingCategorias] = useState(true);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-
+  // Cargar categorías
   useEffect(() => {
     const cargarCategorias = async () => {
       try {
         setLoadingCategorias(true);
-       
         const response = await api.get("/Categorias");
         setCategorias(response.data);
       } catch (err) {
@@ -53,68 +68,60 @@ export default function RegistroEmpresa() {
     cargarCategorias();
   }, []);
 
- 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
- 
+  // Manejo del horario
+  const handleHorarioChange = (index, field, value) => {
+    const nuevoHorario = [...horario];
+    nuevoHorario[index][field] = value;
+    setHorario(nuevoHorario);
+  };
+
+  // Manejo de imagen
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setUploading(true);
     setError(null);
     try {
       const { publicUrl } = await uploadImage(file, "negocios");
-      setFormData((prev) => ({
-        ...prev,
-        linkUrl: publicUrl,
-      }));
+      setFormData((prev) => ({ ...prev, linkUrl: publicUrl }));
     } catch (err) {
       console.error(err);
-      setError("No se pudo subir la imagen. Intenta otra vez.");
+      setError("No se pudo subir la imagen.");
     } finally {
       setUploading(false);
     }
   };
 
-
+  // Envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    if (!formData.idCategoria) {
-      setError("Por favor, seleccione una categoría para su negocio.");
-      setLoading(false);
-      return;
-    }
-    if (formData.contrasena.length < 6) {
-      setError("La contraseña debe tener al menos 6 caracteres.");
-      setLoading(false);
-      return;
-    }
+    if (!formData.idCategoria) { setError("Seleccione una categoría."); setLoading(false); return; }
+    if (formData.contrasena.length < 6) { setError("Contraseña muy corta."); setLoading(false); return; }
+
+    // Serializamos el horario a JSON String para la base de datos
+    const horarioString = JSON.stringify(horario);
 
     try {
-  
-      const usuarioDto = {
-        Nombre: formData.nombreUsuario,          
-        Email: formData.email,               
-        ContrasenaHash: formData.contrasena,    
-        IdRol: 2, 
+      // 1. Crear Usuario
+      const resUser = await api.post("/Usuarios", {
+        Nombre: formData.nombreUsuario,
+        Email: formData.email,
+        ContrasenaHash: formData.contrasena,
+        IdRol: 2, // Admin de Negocio
         Token: null,
-      };
-      
-      const responseUsuario = await api.post("/Usuarios", usuarioDto);
-      const idUsuarioCreado = responseUsuario.data.IdUsuario;
+      });
+      const idUser = resUser.data.IdUsuario;
 
-     
-      const negocioDto = {
+      // 2. Crear Negocio
+      const resNegocio = await api.post("/Negocios", {
         IdCategoria: parseInt(formData.idCategoria),
         IdMembresia: formData.idMembresia,
         Nombre: formData.nombreNegocio,
@@ -124,37 +131,30 @@ export default function RegistroEmpresa() {
         Descripcion: formData.descripcion,
         TelefonoContacto: formData.telefonoContacto,
         CorreoContacto: formData.correoContacto,
-        HorarioAtencion: formData.horarioAtencion,
+        HorarioAtencion: horarioString, 
         LinkUrl: formData.linkUrl,
-      };
-      
-      const responseNegocio = await api.post("/Negocios", negocioDto);
-      const idNegocioCreado = responseNegocio.data.IdNegocio;
+      });
+      const idNegocio = resNegocio.data.IdNegocio;
 
-      if (!idUsuarioCreado || !idNegocioCreado) {
-        throw new Error("Error: No se obtuvieron los IDs del servidor.");
-      }
-
-    
-      const personalDto = {
-        IdUsuario: idUsuarioCreado,
-        IdNegocio: idNegocioCreado,
+      // 3. Vincular (Personal)
+      await api.post("/Personal", {
+        IdUsuario: idUser,
+        IdNegocio: idNegocio,
         RolEnNegocio: "Administrador",
-      };
-      
-      await api.post("/Personal", personalDto);
+      });
 
-     
       setLoading(false);
-      alert("¡Registro enviado exitosamente! Su solicitud será revisada.");
-      navigate("/"); 
+      alert("¡Negocio registrado exitosamente!");
+      navigate("/");
 
     } catch (err) {
       console.error(err);
-      setError("Error en el registro. " + (err.response?.data?.message || err.message));
+      setError("Error: " + (err.response?.data?.message || err.message));
       setLoading(false);
     }
   };
+
+  const activeDays = horario.filter(d => d.activo).length;
 
   return (
     <div className="register-page">
@@ -162,191 +162,95 @@ export default function RegistroEmpresa() {
       <div className="register-wrapper">
         <div className="register-card">
           <h1>Registra tu Negocio</h1>
-          <p>Crea tu cuenta de administrador y registra tu negocio al mismo tiempo.</p>
+          <p>Datos del administrador y del establecimiento.</p>
 
           <form onSubmit={handleSubmit} className="register-form">
             
-            {/* --- USUARIO --- */}
             <fieldset>
-              <legend>Datos del Administrador</legend>
+              <legend>Datos del Dueño</legend>
               <div className="form-group">
-                <label htmlFor="nombreUsuario">Tu Nombre Completo</label>
-                <input
-                  type="text"
-                  id="nombreUsuario"
-                  name="nombreUsuario"
-                  value={formData.nombreUsuario}
-                  onChange={handleChange}
-                  required
-                />
+                <label>Nombre Completo</label>
+                <input type="text" name="nombreUsuario" value={formData.nombreUsuario} onChange={handleChange} required />
               </div>
               <div className="form-group">
-                <label htmlFor="email">Tu Email (Para iniciar sesión)</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
+                <label>Email</label>
+                <input type="email" name="email" value={formData.email} onChange={handleChange} required />
               </div>
               <div className="form-group span-2">
-                <label htmlFor="contrasena">Tu Contraseña (mín. 6 caracteres)</label>
-                <input
-                  type="password"
-                  id="contrasena"
-                  name="contrasena"
-                  value={formData.contrasena}
-                  onChange={handleChange}
-                  required
-                />
+                <label>Contraseña</label>
+                <input type="password" name="contrasena" value={formData.contrasena} onChange={handleChange} required />
               </div>
             </fieldset>
 
-            {/* --- NEGOCIO --- */}
             <fieldset>
               <legend>Datos del Negocio</legend>
               <div className="form-group span-2">
-                <label htmlFor="nombreNegocio">Nombre del Negocio</label>
-                <input
-                  type="text"
-                  id="nombreNegocio"
-                  name="nombreNegocio"
-                  placeholder="Ej: Barbería El Rey"
-                  value={formData.nombreNegocio}
-                  onChange={handleChange}
-                  required
-                />
+                <label>Nombre del Negocio</label>
+                <input type="text" name="nombreNegocio" value={formData.nombreNegocio} onChange={handleChange} required />
               </div>
               
               <div className="form-group">
-                <label htmlFor="idCategoria">Categoría</label>
-                {loadingCategorias ? (
-                  <p style={{fontSize: "0.9rem", color: "#666"}}>Cargando categorías...</p>
-                ) : (
-                  <select
-                    id="idCategoria"
-                    name="idCategoria"
-                    value={formData.idCategoria}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="">-- Seleccione una categoría --</option>
-                    {categorias.map((cat) => (
-                      // Usamos PascalCase porque así vienen de la API
-                      <option key={cat.IdCategoria} value={cat.IdCategoria}>
-                        {cat.NombreCategoria}
-                      </option>
-                    ))}
-                  </select>
-                )}
+                <label>Categoría</label>
+                <select name="idCategoria" value={formData.idCategoria} onChange={handleChange} required>
+                  <option value="">-- Selecciona --</option>
+                  {categorias.map((cat) => (
+                    <option key={cat.IdCategoria} value={cat.IdCategoria}>{cat.NombreCategoria}</option>
+                  ))}
+                </select>
               </div>
-
               <div className="form-group">
-                <label htmlFor="telefonoContacto">Teléfono</label>
-                <input
-                  type="tel"
-                  id="telefonoContacto"
-                  name="telefonoContacto"
-                  placeholder="Ej: 477 123 4567"
-                  value={formData.telefonoContacto}
-                  onChange={handleChange}
-                />
+                <label>Teléfono</label>
+                <input type="tel" name="telefonoContacto" value={formData.telefonoContacto} onChange={handleChange} />
               </div>
-
               <div className="form-group span-2">
-                <label htmlFor="direccion">Dirección</label>
-                <input
-                  type="text"
-                  id="direccion"
-                  name="direccion"
-                  value={formData.direccion}
-                  onChange={handleChange}
-                />
+                <label>Dirección</label>
+                <input type="text" name="direccion" value={formData.direccion} onChange={handleChange} />
               </div>
-
               <div className="form-group span-2">
-                <label htmlFor="descripcion">Descripción</label>
-                <textarea
-                  id="descripcion"
-                  name="descripcion"
-                  placeholder="Describe tus servicios..."
-                  value={formData.descripcion}
-                  onChange={handleChange}
-                />
+                <label>Descripción</label>
+                <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="correoContacto">Email de Contacto</label>
-                <input
-                  type="email"
-                  id="correoContacto"
-                  name="correoContacto"
-                  value={formData.correoContacto}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="horarioAtencion">Horario</label>
-                <input
-                  type="text"
-                  id="horarioAtencion"
-                  name="horarioAtencion"
-                  placeholder="Ej: L-S 10:00 a 19:00"
-                  value={formData.horarioAtencion}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="coordenadasLat">Latitud</label>
-                <input
-                  type="number"
-                  id="coordenadasLat"
-                  name="coordenadasLat"
-                  value={formData.coordenadasLat}
-                  onChange={handleChange}
-                  step="any"
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="coordenadasLng">Longitud</label>
-                <input
-                  type="number"
-                  id="coordenadasLng"
-                  name="coordenadasLng"
-                  value={formData.coordenadasLng}
-                  onChange={handleChange}
-                  step="any"
-                />
-              </div>
-
+              {/* BOTÓN DE HORARIO */}
               <div className="form-group span-2">
-                <label htmlFor="fileInput">Imagen del Negocio</label>
-                <input
-                  type="file"
-                  id="fileInput"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  disabled={uploading}
-                  style={{ marginBottom: "8px" }}
-                />
-                {uploading && <small style={{ color: "#3843c2" }}>Subiendo imagen...</small>}
+                <label style={{marginBottom: '5px', display:'block'}}>Horario de Atención</label>
                 
-                <input
-                  type="text"
-                  id="linkUrl"
-                  name="linkUrl"
-                  placeholder="URL de la imagen"
-                  value={formData.linkUrl}
-                  onChange={handleChange}
-                  readOnly
-                  style={{ backgroundColor: "#f0f0f0", color: "#555" }}
-                />
+                <button 
+                  type="button" 
+                  className="btn-config-horario"
+                  onClick={() => setShowScheduleModal(true)}
+                >
+                  <FaCalendarAlt /> Configurar Días y Horas
+                </button>
 
+                <div className="horario-resumen">
+                  <strong>Estado actual:</strong>
+                  {activeDays === 0 
+                    ? "No se han configurado días de atención (Cerrado)." 
+                    : `${activeDays} días activos configurados.`
+                  }
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Email Contacto</label>
+                <input type="email" name="correoContacto" value={formData.correoContacto} onChange={handleChange} />
+              </div>
+
+              <div className="form-group">
+                <label>Latitud</label>
+                <input type="number" name="coordenadasLat" value={formData.coordenadasLat} onChange={handleChange} step="any" />
+              </div>
+              <div className="form-group">
+                <label>Longitud</label>
+                <input type="number" name="coordenadasLng" value={formData.coordenadasLng} onChange={handleChange} step="any" />
+              </div>
+
+              <div className="form-group span-2">
+                <label>Imagen del Negocio</label>
+                <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} />
+                {uploading && <small>Subiendo...</small>}
+                
                 {formData.linkUrl && (
                   <div style={{ marginTop: "10px", textAlign: "center" }}>
                     <img
@@ -361,16 +265,71 @@ export default function RegistroEmpresa() {
 
             {error && <p className="register-error">{error}</p>}
 
-            <button
-              type="submit"
-              className="btn-submit-registro"
-              disabled={loading || loadingCategorias || uploading}
-            >
+            <button type="submit" className="btn-submit-registro" disabled={loading || uploading}>
               {loading ? "Registrando..." : "Registrar mi Negocio"}
             </button>
           </form>
         </div>
       </div>
+
+      {/* MODAL DE HORARIO */}
+      {showScheduleModal && (
+        <div className="modal-horario-overlay" onClick={() => setShowScheduleModal(false)}>
+          <div className="modal-horario-content" onClick={(e) => e.stopPropagation()}>
+            
+            <div className="modal-horario-header">
+              <h3>Configurar Horario</h3>
+              <button className="btn-close-modal" onClick={() => setShowScheduleModal(false)}>✕</button>
+            </div>
+            
+            <p style={{fontSize: '0.9rem', color:'#666', marginBottom:'15px'}}>
+              Marca los días que abres y define la hora de apertura y cierre.
+            </p>
+
+            <div className="horario-grid">
+              {horario.map((dia, idx) => (
+                <div key={dia.dia} className={`horario-row ${dia.activo ? 'activo' : ''}`}>
+                  <div className="horario-check">
+                    <input 
+                      type="checkbox" 
+                      checked={dia.activo} 
+                      onChange={(e) => handleHorarioChange(idx, 'activo', e.target.checked)}
+                    />
+                    <span style={{color:'#0a3d62', fontWeight:'bold', marginLeft:'8px'}}>{dia.dia}</span>
+                  </div>
+                  
+                  <div className="horario-horas">
+                    <FaClock size={12} color="#999" style={{marginRight:'5px'}}/>
+                    <input 
+                      type="time" 
+                      value={dia.inicio} 
+                      disabled={!dia.activo}
+                      onChange={(e) => handleHorarioChange(idx, 'inicio', e.target.value)}
+                    />
+                    <span style={{margin:'0 5px'}}>-</span>
+                    <input 
+                      type="time" 
+                      value={dia.fin} 
+                      disabled={!dia.activo}
+                      onChange={(e) => handleHorarioChange(idx, 'fin', e.target.value)}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button 
+              type="button" 
+              className="btn-save-horario"
+              onClick={() => setShowScheduleModal(false)}
+            >
+              Confirmar Horario
+            </button>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
