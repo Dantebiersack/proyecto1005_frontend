@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { getValoraciones } from "../../../services/voloracionesService";
+import { getMisValoraciones } from "../../../services/valoracionesService";
 
 export default function Valoraciones() {
   const [valoraciones, setValoraciones] = useState([]);
@@ -17,14 +17,11 @@ export default function Valoraciones() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // 🚨 TEMPORAL: ID del negocio (luego dinámico)
-  const negocioId = 1;
-
-  // Obtener valoraciones del negocio
+  // Obtener valoraciones del negocio del usuario logueado
   useEffect(() => {
     const cargarValoraciones = async () => {
       try {
-        const data = await getValoraciones(negocioId);
+        const data = await getMisValoraciones();
         setValoraciones(data);
       } catch (err) {
         console.error(err);
@@ -33,8 +30,9 @@ export default function Valoraciones() {
         setLoading(false);
       }
     };
+
     cargarValoraciones();
-  }, [negocioId]);
+  }, []);
 
   // Filtrar por estrellas
   const valoracionesFiltradas = filtro
@@ -128,4 +126,3 @@ export default function Valoraciones() {
     </div>
   );
 }
-//Sube

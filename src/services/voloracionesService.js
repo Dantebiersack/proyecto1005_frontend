@@ -1,25 +1,24 @@
+// src/services/valoracionesService.js
 import api from "./api";
 
-// Obtener valoraciones por negocio
-export const getValoraciones = async (idNegocio) => {
+// Obtener SOLO las valoraciones del negocio del usuario logueado
+export const getMisValoraciones = async () => {
   try {
-    const response = await api.get(`/Valoraciones/Negocio/${idNegocio}`);
-    return response.data;
+    const res = await api.get("/Valoraciones/MisValoraciones");
+    return res.data;
   } catch (error) {
-    console.error("Error al obtener valoraciones:", error);
+    console.error("Error al obtener mis valoraciones:", error);
     throw error;
   }
 };
 
-// Enviar una respuesta a una valoración
+// Responder a una valoración (este NO se toca)
 export const responderValoracion = async (id, respuesta) => {
   try {
-    const response = await api.post(`/Valoraciones/${id}/respuesta`, { respuesta });
-    return response.data;
+    const res = await api.post(`/Valoraciones/${id}/respuesta`, { respuesta });
+    return res.data;
   } catch (error) {
     console.error("Error al responder valoración:", error);
     throw error;
   }
 };
-
-//sube
