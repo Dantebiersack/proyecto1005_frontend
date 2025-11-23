@@ -109,14 +109,13 @@ export default function Sidebar({ open, onClose }) {
   return (
     <>
       <div className={`nb-overlay ${open ? "open" : ""}`} onClick={onClose} />
-
       <aside className={`nb-sidebar ${open ? "open" : ""}`}>
         <button className="nb-close-btn" onClick={onClose} aria-label="Cerrar">
           <MdClose size={20} color="#fff" />
         </button>
 
         <div className="nb-user">
-          <img className="nb-avatar" src="https://i.pravatar.cc/80" alt="" />
+          <img className="nb-avatar" src="https://bfkzgpumokljugdfbfwp.supabase.co/storage/v1/object/public/nearbiz-uploads/negocios/istockphoto-1300845620-612x612.jpg" alt="avatar" />
           <div>
             <div className="nb-name">{user?.name ?? "Invitado"}</div>
             <div className="nb-email">{user?.email ?? "sin-correo"}</div>

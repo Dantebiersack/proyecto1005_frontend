@@ -13,7 +13,7 @@ function NavbarInicio({ onMenuClick }) {
         {/* logo */}
         <div className="logo-container">
           <img
-            src="../../assets/nearBizLogo.jpg"
+            src="https://bfkzgpumokljugdfbfwp.supabase.co/storage/v1/object/public/nearbiz-uploads/negocios/nearBizLogo.jpg"
             alt="NearBiz Logo"
             className="navbar-logo"
           />
