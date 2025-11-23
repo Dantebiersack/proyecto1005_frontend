@@ -1,24 +1,24 @@
 // src/services/miEmpresaService.js
 import api from "./api";
 
-// 🔹 Obtener datos de un negocio por su ID
-export const getNegocioById = async (id) => {
+// 🔹 Obtener datos del negocio del usuario autenticado
+export const getMiNegocio = async () => {
   try {
-    const response = await api.get(`/Negocios/${id}`);
+    const response = await api.get("/Negocios/mine"); // usa token
     return response.data;
   } catch (error) {
-    console.error("Error al obtener el negocio:", error);
+    console.error("Error al obtener MI negocio:", error);
     throw error;
   }
 };
 
-// 🔹 Obtener todas las categorías
+// 🔹 Obtener categorías
 export const getCategorias = async () => {
   try {
     const response = await api.get("/Categorias");
     return response.data;
   } catch (error) {
-    console.error("Error al obtener las categorías:", error);
+    console.error("Error al obtener categorías:", error);
     throw error;
   }
 };
@@ -29,7 +29,7 @@ export const updateNegocio = async (id, negocioData) => {
     const response = await api.put(`/Negocios/${id}`, negocioData);
     return response.data;
   } catch (error) {
-    console.error("Error al actualizar el negocio:", error);
+    console.error("Error al actualizar negocio:", error);
     throw error;
   }
 };

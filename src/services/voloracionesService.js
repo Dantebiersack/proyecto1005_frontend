@@ -1,7 +1,5 @@
-// src/services/valoracionesService.js
 import api from "./api";
 
-// Obtener SOLO las valoraciones del negocio del usuario logueado
 export const getMisValoraciones = async () => {
   try {
     const res = await api.get("/Valoraciones/MisValoraciones");
@@ -12,7 +10,6 @@ export const getMisValoraciones = async () => {
   }
 };
 
-// Responder a una valoración (este NO se toca)
 export const responderValoracion = async (id, respuesta) => {
   try {
     const res = await api.post(`/Valoraciones/${id}/respuesta`, { respuesta });

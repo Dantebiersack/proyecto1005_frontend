@@ -2,55 +2,79 @@
 import React, { useState, useEffect } from "react";
 import "./MiEmpresa.css";
 import {
-  getNegocioById,
+  getMiNegocio,
   getCategorias,
-  updateNegocio,
+  updateNegocio
 } from "../../../services/miempresaService";
 
+const DIAS_SEMANA = [
+  "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"
+];
+
 export default function MiEmpresa() {
-  const negocioId = 1;
   const [formData, setFormData] = useState({
     IdCategoria: "",
-    IdMembresia: null,
     Nombre: "",
     Direccion: "",
-    CoordenadasLat: "",
-    CoordenadasLng: "",
-    Descripcion: "",
     TelefonoContacto: "",
     CorreoContacto: "",
-    HorarioAtencion: "",
+    Descripcion: "",
     LinkUrl: "",
+    CoordenadasLat: "",
+    CoordenadasLng: "",
+    HorarioAtencion: "[]"
   });
 
+  const [horario, setHorario] = useState([]);
   const [categorias, setCategorias] = useState([]);
-  const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [editMode, setEditMode] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const cargarDatos = async () => {
+    const cargar = async () => {
       try {
-        const [dataNegocio, dataCat] = await Promise.all([
-          getNegocioById(negocioId),
-          getCategorias(),
-        ]);
-        setFormData(dataNegocio);
-        setCategorias(dataCat);
+        const negocio = await getMiNegocio();
+        const cat = await getCategorias();
+
+        setCategorias(cat);
+
+        setFormData(negocio);
+
+        // 🔹 Cargar horario (si existe)
+        if (negocio.HorarioAtencion) {
+          setHorario(JSON.parse(negocio.HorarioAtencion));
+        } else {
+          setHorario(DIAS_SEMANA.map(d => ({
+            dia: d,
+            activo: false,
+            inicio: "09:00",
+            fin: "18:00"
+          })));
+        }
       } catch (err) {
         console.error(err);
-        setError("No se pudieron cargar los datos del negocio.");
+        setError("Error al cargar datos del negocio.");
       } finally {
         setLoading(false);
       }
     };
-    cargarDatos();
-  }, [negocioId]);
+
+    cargar();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleHorarioChange = (i, field, value) => {
+    const copia = [...horario];
+    copia[i][field] = value;
+    setHorario(copia);
   };
 
   const handleSubmit = async (e) => {
@@ -59,17 +83,21 @@ export default function MiEmpresa() {
     setSuccess("");
 
     try {
-      await updateNegocio(negocioId, formData);
-      setSuccess("✅ Datos actualizados correctamente.");
+      const data = {
+        ...formData,
+        HorarioAtencion: JSON.stringify(horario)
+      };
+
+      await updateNegocio(formData.IdNegocio, data);
+      setSuccess("Datos actualizados correctamente.");
       setEditMode(false);
     } catch (err) {
       console.error(err);
-      setError("❌ No se pudieron actualizar los datos.");
+      setError("No se pudieron actualizar los datos.");
     }
   };
 
-  if (loading) return <p className="mensaje">Cargando datos...</p>;
-  if (error) return <p className="mensaje error">{error}</p>;
+  if (loading) return <p>Cargando...</p>;
 
   return (
     <div className="miempresa-container">
@@ -79,143 +107,106 @@ export default function MiEmpresa() {
         <p><strong>Nombre:</strong> {formData.Nombre}</p>
         <p><strong>Dirección:</strong> {formData.Direccion}</p>
         <p><strong>Teléfono:</strong> {formData.TelefonoContacto}</p>
-        <p><strong>Correo:</strong> {formData.CorreoContacto}</p>
-        <p><strong>Horario:</strong> {formData.HorarioAtencion}</p>
+        <p><strong>Email:</strong> {formData.CorreoContacto}</p>
         <p><strong>Descripción:</strong> {formData.Descripcion}</p>
-        <p>
-          <strong>Link:</strong>{" "}
-          <a href={formData.LinkUrl} target="_blank" rel="noreferrer">
-            {formData.LinkUrl}
-          </a>
-        </p>
+        <p><strong>Horario:</strong> Configurado</p>
       </div>
 
-      <div className="botones">
-        <button type="button" className="editar" onClick={() => setEditMode(true)}>
-          Editar
-        </button>
-      </div>
+      <button className="editar" onClick={() => setEditMode(true)}>
+        Editar
+      </button>
 
-      {/* 🔹 Modal flotante de edición */}
       {editMode && (
         <div className="modal-overlay">
           <div className="modal">
-            <h2>Editar Datos de Empresa</h2>
-            <form onSubmit={handleSubmit} className="miempresa-form">
-              <div className="form-row">
-                <div className="form-col">
-                  <label>Nombre:</label>
-                  <input
-                    type="text"
-                    name="Nombre"
-                    value={formData.Nombre || ""}
-                    onChange={handleChange}
-                  />
+            <form onSubmit={handleSubmit}>
+              <h2>Editar Datos</h2>
 
-                  <label>Dirección:</label>
-                  <input
-                    type="text"
-                    name="Direccion"
-                    value={formData.Direccion || ""}
-                    onChange={handleChange}
-                  />
+              <label>Nombre:</label>
+              <input name="Nombre" value={formData.Nombre} onChange={handleChange} />
 
-                  <label>Teléfono:</label>
-                  <input
-                    type="text"
-                    name="TelefonoContacto"
-                    value={formData.TelefonoContacto || ""}
-                    onChange={handleChange}
-                  />
+              <label>Dirección:</label>
+              <input name="Direccion" value={formData.Direccion} onChange={handleChange} />
 
-                  <label>Correo:</label>
-                  <input
-                    type="email"
-                    name="CorreoContacto"
-                    value={formData.CorreoContacto || ""}
-                    onChange={handleChange}
-                  />
+              <label>Teléfono:</label>
+              <input name="TelefonoContacto" value={formData.TelefonoContacto} onChange={handleChange} />
 
-                  <label>Categoría:</label>
-                  <select
-                    name="IdCategoria"
-                    value={formData.IdCategoria || ""}
-                    onChange={handleChange}
-                  >
-                    <option key="default" value="">
-                      Selecciona una categoría
-                    </option>
-                    {categorias.map((cat, index) => (
-                      <option
-                        key={cat.idCategoria || index}
-                        value={cat.idCategoria}
-                      >
-                        {cat.nombre || cat.Nombre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <label>Correo:</label>
+              <input name="CorreoContacto" value={formData.CorreoContacto} onChange={handleChange} />
 
-                <div className="form-col">
-                  <label>Horario de Atención:</label>
-                  <input
-                    type="text"
-                    name="HorarioAtencion"
-                    value={formData.HorarioAtencion || ""}
-                    onChange={handleChange}
-                  />
+              <label>Categoría:</label>
+              <select name="IdCategoria" value={formData.IdCategoria} onChange={handleChange}>
+                <option value="">Seleccione</option>
+                {categorias.map(c => (
+                  <option key={c.IdCategoria} value={c.IdCategoria}>
+                    {c.NombreCategoria}
+                  </option>
+                ))}
+              </select>
 
-                  <label>Descripción:</label>
-                  <textarea
-                    name="Descripcion"
-                    value={formData.Descripcion || ""}
-                    onChange={handleChange}
-                  />
+              <label>Descripción:</label>
+              <textarea name="Descripcion" value={formData.Descripcion} onChange={handleChange} />
 
-                  <label>Link URL:</label>
-                  <input
-                    type="text"
-                    name="LinkUrl"
-                    value={formData.LinkUrl || ""}
-                    onChange={handleChange}
-                  />
+              <label>Link URL:</label>
+              <input name="LinkUrl" value={formData.LinkUrl} onChange={handleChange} />
 
-                  <label>Coordenadas Latitud:</label>
-                  <input
-                    type="number"
-                    step="0.000001"
-                    name="CoordenadasLat"
-                    value={formData.CoordenadasLat || ""}
-                    onChange={handleChange}
-                  />
+              {/* HORARIO */}
+              <button
+                type="button"
+                className="btn-horario"
+                onClick={() => setShowScheduleModal(true)}
+              >
+                Editar Horarios
+              </button>
 
-                  <label>Coordenadas Longitud:</label>
-                  <input
-                    type="number"
-                    step="0.000001"
-                    name="CoordenadasLng"
-                    value={formData.CoordenadasLng || ""}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
+              <button className="guardar" type="submit">Guardar</button>
+              <button className="cancelar" type="button" onClick={() => setEditMode(false)}>
+                Cancelar
+              </button>
 
-              <div className="botones">
-                <button type="submit" className="guardar">
-                  Guardar
-                </button>
-                <button
-                  type="button"
-                  className="cancelar"
-                  onClick={() => setEditMode(false)}
-                >
-                  Cancelar
-                </button>
-              </div>
-
-              {success && <p className="mensaje success">{success}</p>}
-              {error && <p className="mensaje error">{error}</p>}
+              {success && <p className="success">{success}</p>}
+              {error && <p className="error">{error}</p>}
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL HORARIO */}
+      {showScheduleModal && (
+        <div className="modal-horario-overlay" onClick={() => setShowScheduleModal(false)}>
+          <div className="modal-horario-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Configurar Horario</h3>
+
+            {horario.map((dia, i) => (
+              <div key={dia.dia} className="horario-row">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={dia.activo}
+                    onChange={e => handleHorarioChange(i, "activo", e.target.checked)}
+                  />
+                  {dia.dia}
+                </label>
+
+                <input
+                  type="time"
+                  value={dia.inicio}
+                  disabled={!dia.activo}
+                  onChange={e => handleHorarioChange(i, "inicio", e.target.value)}
+                />
+
+                <input
+                  type="time"
+                  value={dia.fin}
+                  disabled={!dia.activo}
+                  onChange={e => handleHorarioChange(i, "fin", e.target.value)}
+                />
+              </div>
+            ))}
+
+            <button className="guardar" onClick={() => setShowScheduleModal(false)}>
+              Guardar Horarios
+            </button>
           </div>
         </div>
       )}
