@@ -13,6 +13,7 @@ const DIAS_SEMANA = [
 
 export default function MiEmpresa() {
   const [formData, setFormData] = useState({
+    IdNegocio: null,
     IdCategoria: "",
     Nombre: "",
     Direccion: "",
@@ -30,30 +31,26 @@ export default function MiEmpresa() {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
     const cargar = async () => {
       try {
-        const negocio = await getMiNegocio();
+        const negocio = await getMiNegocio(); // Puede ser null
         const cat = await getCategorias();
-
         setCategorias(cat);
 
-        setFormData(negocio);
-
-        // 🔹 Cargar horario (si existe)
-        if (negocio.HorarioAtencion) {
-          setHorario(JSON.parse(negocio.HorarioAtencion));
+        if (negocio) {
+          setFormData(negocio);
+          // Cargar horario si existe
+          setHorario(
+            negocio.HorarioAtencion ? JSON.parse(negocio.HorarioAtencion) :
+            DIAS_SEMANA.map(d => ({ dia: d, activo: false, inicio: "09:00", fin: "18:00" }))
+          );
         } else {
-          setHorario(DIAS_SEMANA.map(d => ({
-            dia: d,
-            activo: false,
-            inicio: "09:00",
-            fin: "18:00"
-          })));
+          // Si no hay negocio, inicializar horario vacío
+          setHorario(DIAS_SEMANA.map(d => ({ dia: d, activo: false, inicio: "09:00", fin: "18:00" })));
         }
       } catch (err) {
         console.error(err);
@@ -62,7 +59,6 @@ export default function MiEmpresa() {
         setLoading(false);
       }
     };
-
     cargar();
   }, []);
 
@@ -83,12 +79,8 @@ export default function MiEmpresa() {
     setSuccess("");
 
     try {
-      const data = {
-        ...formData,
-        HorarioAtencion: JSON.stringify(horario)
-      };
-
-      await updateNegocio(formData.IdNegocio, data);
+      const data = { ...formData, HorarioAtencion: JSON.stringify(horario) };
+      await updateNegocio(formData.IdNegocio ? formData.IdNegocio : "MiNegocio", data);
       setSuccess("Datos actualizados correctamente.");
       setEditMode(false);
     } catch (err) {
@@ -103,18 +95,20 @@ export default function MiEmpresa() {
     <div className="miempresa-container">
       <h1>Mi Empresa</h1>
 
-      <div className="datos-empresa">
-        <p><strong>Nombre:</strong> {formData.Nombre}</p>
-        <p><strong>Dirección:</strong> {formData.Direccion}</p>
-        <p><strong>Teléfono:</strong> {formData.TelefonoContacto}</p>
-        <p><strong>Email:</strong> {formData.CorreoContacto}</p>
-        <p><strong>Descripción:</strong> {formData.Descripcion}</p>
-        <p><strong>Horario:</strong> Configurado</p>
-      </div>
+      {formData.Nombre ? (
+        <div className="datos-empresa">
+          <p><strong>Nombre:</strong> {formData.Nombre}</p>
+          <p><strong>Dirección:</strong> {formData.Direccion}</p>
+          <p><strong>Teléfono:</strong> {formData.TelefonoContacto}</p>
+          <p><strong>Email:</strong> {formData.CorreoContacto}</p>
+          <p><strong>Descripción:</strong> {formData.Descripcion}</p>
+          <p><strong>Horario:</strong> Configurado</p>
+        </div>
+      ) : (
+        <p>No tienes un negocio registrado aún.</p>
+      )}
 
-      <button className="editar" onClick={() => setEditMode(true)}>
-        Editar
-      </button>
+      <button className="editar" onClick={() => setEditMode(true)}>Editar</button>
 
       {editMode && (
         <div className="modal-overlay">
@@ -138,9 +132,7 @@ export default function MiEmpresa() {
               <select name="IdCategoria" value={formData.IdCategoria} onChange={handleChange}>
                 <option value="">Seleccione</option>
                 {categorias.map(c => (
-                  <option key={c.IdCategoria} value={c.IdCategoria}>
-                    {c.NombreCategoria}
-                  </option>
+                  <option key={c.IdCategoria} value={c.IdCategoria}>{c.NombreCategoria}</option>
                 ))}
               </select>
 
@@ -160,9 +152,7 @@ export default function MiEmpresa() {
               </button>
 
               <button className="guardar" type="submit">Guardar</button>
-              <button className="cancelar" type="button" onClick={() => setEditMode(false)}>
-                Cancelar
-              </button>
+              <button className="cancelar" type="button" onClick={() => setEditMode(false)}>Cancelar</button>
 
               {success && <p className="success">{success}</p>}
               {error && <p className="error">{error}</p>}
@@ -204,9 +194,7 @@ export default function MiEmpresa() {
               </div>
             ))}
 
-            <button className="guardar" onClick={() => setShowScheduleModal(false)}>
-              Guardar Horarios
-            </button>
+            <button className="guardar" onClick={() => setShowScheduleModal(false)}>Guardar Horarios</button>
           </div>
         </div>
       )}
