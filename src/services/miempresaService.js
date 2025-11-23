@@ -4,7 +4,7 @@ import api from "./api";
 // 🔹 Obtener datos del negocio del usuario autenticado
 export const getMiNegocio = async () => {
   try {
-    const response = await api.get("/Negocios/mine"); // Usa token automáticamente
+    const response = await api.get("/Negocios/MiNegocio"); // 🔹 Ruta correcta
     return response.data;
   } catch (error) {
     console.error("Error al obtener MI negocio:", error);
@@ -26,6 +26,12 @@ export const getCategorias = async () => {
 // 🔹 Actualizar negocio por ID
 export const updateNegocio = async (id, negocioData) => {
   try {
+    // 🔹 Si quieres actualizar usando el endpoint del propio usuario:
+    if (id === "MiNegocio") {
+      const response = await api.put("/Negocios/MiNegocio", negocioData);
+      return response.data;
+    }
+    // 🔹 Si actualizas un negocio por ID normal
     const response = await api.put(`/Negocios/${id}`, negocioData);
     return response.data;
   } catch (error) {
