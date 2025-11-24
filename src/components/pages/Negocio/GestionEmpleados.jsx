@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom"; 
 import {
   getPersonal,
   createPersonal,
@@ -25,7 +24,6 @@ const FORM_INICIAL = {
 
 export default function GestionEmpleados() {
   const { user } = useAuth(); 
-  const navigate = useNavigate(); 
 
   const [empleados, setEmpleados] = useState([]); 
   const [loading, setLoading] = useState(true);
@@ -35,27 +33,12 @@ export default function GestionEmpleados() {
   const [editing, setEditing] = useState(null); 
   const [formData, setFormData] = useState(FORM_INICIAL);
 
+  // Identificar si el usuario logueado es solo "personal" (empleado)
   const isLoggedAsEmployee = user?.roles?.includes("personal");
 
-
   useEffect(() => {
-   
-    if (!user?.idNegocio) {
-      setLoading(false);
-     
-      Swal.fire({
-        title: "Acceso Restringido",
-        text: "Tu usuario no tiene un negocio asignado. Por favor contacta a soporte o regístrate como dueño.",
-        icon: "warning",
-        confirmButtonColor: "#0a3d62",
-        confirmButtonText: "Entendido"
-      });
-      return; 
-    }
-
-   
     cargar();
-  }, [user]); 
+  }, []);
 
   async function cargar() {
     try {
@@ -122,7 +105,7 @@ export default function GestionEmpleados() {
         await updateUsuario(editing.idUsuario, {
           Nombre: formData.nombre,
           Email: formData.email, 
-          IdRol: editing.idRol, 
+          IdRol: editing.idRol, // Mantiene su rol de sistema original
         });
         await updatePersonal(editing.idPersonal, {
           IdUsuario: editing.idUsuario, 
@@ -132,6 +115,7 @@ export default function GestionEmpleados() {
         Swal.fire("Actualizado", "Datos actualizados correctamente.", "success");
 
       } else {
+        // Crear Usuario (Rol 3 = Personal)
         const nuevoUsuario = await createUsuario({
           Nombre: formData.nombre,
           Email: formData.email,
@@ -140,6 +124,7 @@ export default function GestionEmpleados() {
           Token: null,
         });
         
+        // Vincular Personal
         await createPersonal({
           IdUsuario: nuevoUsuario.IdUsuario, 
           RolEnNegocio: formData.rolEnNegocio,
@@ -221,22 +206,8 @@ export default function GestionEmpleados() {
     );
   });
 
+  // 👇 Helper para saber si el usuario que estamos editando en el modal es Admin
   const isEditingAdmin = editing && (editing.rolEnNegocio === "Administrador" || editing.rolEnNegocio === "Dueño");
-
-  
-  if (!user?.idNegocio) {
-    return (
-      <div className="gestion-usuarios-page">
-        <div className="gestion-header">
-          <h1>Acceso Restringido</h1>
-          <p style={{color: '#d32f2f'}}>
-            No se detectó un negocio asociado a tu cuenta. <br/>
-            Por favor, asegúrate de haber registrado tu empresa correctamente.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="gestion-usuarios-page">
@@ -343,7 +314,7 @@ export default function GestionEmpleados() {
         </table>
       </div>
 
-    
+      {/* MODAL */}
       {showForm && (
         <div className="nb-modal-overlay" onClick={() => setShowForm(false)}>
           <div className="nb-modal" onClick={(e) => e.stopPropagation()}>
@@ -383,6 +354,7 @@ export default function GestionEmpleados() {
                   onChange={(e) => setFormData((f) => ({ ...f, rolEnNegocio: e.target.value }))} 
                   placeholder="Ej: Estilista, Barbero" 
                   required 
+                  // 👇 AQUÍ ESTÁ LA PROTECCIÓN: Se deshabilita si editamos al admin
                   disabled={isEditingAdmin}
                   style={isEditingAdmin ? {backgroundColor: "#f0f0f0", color: "#888"} : {}}
                   title={isEditingAdmin ? "El rol de administrador no se puede cambiar aquí" : ""}
