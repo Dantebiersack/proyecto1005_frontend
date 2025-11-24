@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../services/api";
-import { deleteUsuario } from "../../../services/usersService"; 
+import { deleteUsuario } from "../../../services/usersService";
 import NavbarInicio from "../../Navbar/NavbarInicio";
 import { uploadImage } from "../../../services/storageService";
 import { FaCalendarAlt, FaClock } from "react-icons/fa"; 
 import Swal from "sweetalert2"; 
 import "./RegistroEmpresa.css";
+
+
+import logoImg from "../../../assets/nearBizLogo.jpg"; 
+import mapaBg from "../../../assets/fondo-mapa.png"; 
 
 const DIAS_SEMANA = [
   "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"
@@ -21,7 +25,6 @@ const HORARIO_INICIAL = DIAS_SEMANA.map(dia => ({
 
 export default function RegistroEmpresa() {
   const navigate = useNavigate();
-
 
   const [formData, setFormData] = useState({
     nombreUsuario: "",
@@ -43,10 +46,10 @@ export default function RegistroEmpresa() {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [categorias, setCategorias] = useState([]);
   const [loadingCategorias, setLoadingCategorias] = useState(true);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-
+  
   useEffect(() => {
     const cargarCategorias = async () => {
       try {
@@ -63,7 +66,7 @@ export default function RegistroEmpresa() {
     cargarCategorias();
   }, []);
 
-  
+ 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -93,10 +96,9 @@ export default function RegistroEmpresa() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    
     if (loading) return;
 
-   
+    
     if (!formData.idCategoria) {
       return Swal.fire("Falta información", "Selecciona una categoría.", "warning");
     }
@@ -110,17 +112,17 @@ export default function RegistroEmpresa() {
     try {
       const horarioString = JSON.stringify(horario);
 
-    
+      // 1. Crear Usuario
       const resUser = await api.post("/Usuarios", {
         Nombre: formData.nombreUsuario,
         Email: formData.email,
         ContrasenaHash: formData.contrasena,
-        IdRol: 2,
+        IdRol: 2, 
         Token: null,
       });
       idUsuarioCreado = resUser.data.IdUsuario;
 
-    
+      // 2. Crear Negocio
       const resNegocio = await api.post("/Negocios", {
         IdCategoria: parseInt(formData.idCategoria),
         IdMembresia: formData.idMembresia,
@@ -143,7 +145,7 @@ export default function RegistroEmpresa() {
         RolEnNegocio: "Administrador",
       });
 
-      
+      setLoading(false);
       Swal.fire({
         title: "¡Bienvenido a NearBiz!",
         text: "Tu negocio ha sido registrado exitosamente.",
@@ -151,166 +153,191 @@ export default function RegistroEmpresa() {
         confirmButtonColor: "#0a3d62",
         confirmButtonText: "Iniciar Sesión"
       }).then(() => {
-        navigate("/login");
+        navigate("/login"); 
       });
 
     } catch (err) {
       console.error("Error en registro:", err);
-      
-      
       const errorDetail = err.response?.data?.detail || err.message;
 
-     
       if (errorDetail && (errorDetail.includes("IX_Usuarios_email") || errorDetail.includes("unique constraint"))) {
-        Swal.fire("Correo Registrado", "Este correo electrónico ya está en uso. Intenta con otro o inicia sesión.", "error");
-      } 
-     
-      else {
-        Swal.fire("Error", "Hubo un problema al registrar. Por favor intenta de nuevo.", "error");
+        Swal.fire("Correo Registrado", "Este correo electrónico ya está en uso.", "error");
+      } else {
+        Swal.fire("Error", "Hubo un problema al registrar. " + errorDetail, "error");
         
-       
         if (idUsuarioCreado) {
-          console.warn(`Rollback: Eliminando usuario incompleto ID ${idUsuarioCreado}...`);
-          try {
-            await deleteUsuario(idUsuarioCreado);
-          } catch (rollbackErr) {
-            console.error("Fallo crítico en rollback:", rollbackErr);
-          }
+          try { await deleteUsuario(idUsuarioCreado); } catch (e) {}
         }
       }
     } finally {
-      setLoading(false);
+      setLoading(false); 
     }
   };
 
   const activeDays = horario.filter(d => d.activo).length;
 
   return (
-    <div className="register-page">
-      <NavbarInicio />
-      <div className="register-wrapper">
-        <div className="register-card">
-          <h1>Registra tu Negocio</h1>
-          <p>Crea tu cuenta de administrador y registra tu negocio.</p>
-
-          <form onSubmit={handleSubmit} className="register-form">
-            
-            <fieldset>
-              <legend>Datos del Dueño</legend>
-              <div className="form-group">
-                <label>Nombre Completo</label>
-                <input type="text" name="nombreUsuario" value={formData.nombreUsuario} onChange={handleChange} required />
-              </div>
-              <div className="form-group">
-                <label>Email</label>
-                <input type="email" name="email" value={formData.email} onChange={handleChange} required />
-              </div>
-              <div className="form-group span-2">
-                <label>Contraseña</label>
-                <input type="password" name="contrasena" value={formData.contrasena} onChange={handleChange} required />
-              </div>
-            </fieldset>
-
-            <fieldset>
-              <legend>Datos del Negocio</legend>
-              <div className="form-group span-2">
-                <label>Nombre del Negocio</label>
-                <input type="text" name="nombreNegocio" value={formData.nombreNegocio} onChange={handleChange} required />
-              </div>
-              <div className="form-group">
-                <label>Categoría</label>
-                <select name="idCategoria" value={formData.idCategoria} onChange={handleChange} required>
-                  <option value="">-- Selecciona --</option>
-                  {categorias.map((cat) => (
-                    <option key={cat.IdCategoria} value={cat.IdCategoria}>{cat.NombreCategoria}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Teléfono</label>
-                <input type="tel" name="telefonoContacto" value={formData.telefonoContacto} onChange={handleChange} />
-              </div>
-              
-             
-              <div className="form-group span-2">
-                <label style={{marginBottom: '5px', display:'block'}}>Horario de Atención</label>
-                <button type="button" className="btn-config-horario" onClick={() => setShowScheduleModal(true)}>
-                  <FaCalendarAlt /> Configurar Días y Horas
-                </button>
-                <div className="horario-resumen">
-                  {activeDays === 0 ? "Cerrado (Sin configurar)." : `${activeDays} días activos.`}
-                </div>
-              </div>
-
-           
-              <div className="form-group span-2">
-                <label>Dirección</label>
-                <input type="text" name="direccion" value={formData.direccion} onChange={handleChange} />
-              </div>
-              <div className="form-group span-2">
-                <label>Descripción</label>
-                <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label>Email Contacto</label>
-                <input type="email" name="correoContacto" value={formData.correoContacto} onChange={handleChange} />
-              </div>
-              <div className="form-group">
-                <label>Latitud</label>
-                <input type="number" name="coordenadasLat" value={formData.coordenadasLat} onChange={handleChange} step="any" />
-              </div>
-              <div className="form-group">
-                <label>Longitud</label>
-                <input type="number" name="coordenadasLng" value={formData.coordenadasLng} onChange={handleChange} step="any" />
-              </div>
-              <div className="form-group span-2">
-                <label>Imagen del Negocio</label>
-                <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} />
-                {uploading && <small>Subiendo...</small>}
-              </div>
-            </fieldset>
-
-            <button 
-              type="submit" 
-              className="btn-submit-registro" 
-             
-              disabled={loading || uploading || loadingCategorias}
-              style={{ opacity: loading ? 0.7 : 1 }}
-            >
-              {loading ? "Procesando..." : "Registrar mi Negocio"}
-            </button>
-          </form>
-        </div>
-      </div>
-
+    
+    <div className="registro-layout">
       
-      {showScheduleModal && (
-        <div className="modal-horario-overlay" onClick={() => setShowScheduleModal(false)}>
-          <div className="modal-horario-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-horario-header">
-              <h3>Configurar Horario</h3>
-              <button className="btn-close-modal" onClick={() => setShowScheduleModal(false)}>✕</button>
-            </div>
-            <div className="horario-grid">
-              {horario.map((dia, idx) => (
-                <div key={dia.dia} className={`horario-row ${dia.activo ? 'activo' : ''}`}>
-                  <div className="horario-check">
-                    <input type="checkbox" checked={dia.activo} onChange={(e) => handleHorarioChange(idx, 'activo', e.target.checked)} />
-                    <span style={{color:'#0a3d62', fontWeight:'bold', marginLeft:'8px'}}>{dia.dia}</span>
-                  </div>
-                  <div className="horario-horas">
-                    <FaClock size={12} color="#999" style={{marginRight:'5px'}}/>
-                    <input type="time" value={dia.inicio} disabled={!dia.activo} onChange={(e) => handleHorarioChange(idx, 'inicio', e.target.value)} />
-                    <span>-</span>
-                    <input type="time" value={dia.fin} disabled={!dia.activo} onChange={(e) => handleHorarioChange(idx, 'fin', e.target.value)} />
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button type="button" className="btn-save-horario" onClick={() => setShowScheduleModal(false)}>Confirmar Horario</button>
+      
+      <NavbarInicio />
+
+      <div className="split-screen-container">
+        
+     
+        <div 
+          className="split-left" 
+          style={{ backgroundImage: `url(${mapaBg})` }} 
+        >
+          <div className="brand-card">
+            <img src={logoImg} alt="NearBiz Logo" className="brand-logo" />
+            <h1>NEARBIZ</h1>
+            <p>Tu agenda, tus empresas cercanas.</p>
           </div>
         </div>
-      )}
+
+        {/* LADO DERECHO */}
+        <div className="split-right">
+          <div className="register-content">
+            <button onClick={() => navigate('/')} className="btn-back">
+              ← Volver al inicio
+            </button>
+
+            <h2>Crea tu cuenta de Negocio</h2>
+            <p>Ingresa tus datos para comenzar a administrar tus citas.</p>
+
+            <form onSubmit={handleSubmit} className="register-form">
+              
+              {/* USUARIO */}
+              <fieldset>
+                <legend>1. Datos del Administrador</legend>
+                <div className="form-group">
+                  <label>Nombre Completo</label>
+                  <input type="text" name="nombreUsuario" value={formData.nombreUsuario} onChange={handleChange} required />
+                </div>
+                <div className="form-grid-2">
+                  <div className="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" value={formData.email} onChange={handleChange} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" name="contrasena" value={formData.contrasena} onChange={handleChange} required />
+                  </div>
+                </div>
+              </fieldset>
+
+              {/* NEGOCIO */}
+              <fieldset>
+                <legend>2. Información del Negocio</legend>
+                <div className="form-group">
+                  <label>Nombre del Negocio</label>
+                  <input type="text" name="nombreNegocio" value={formData.nombreNegocio} onChange={handleChange} placeholder="Ej: Barbería El Rey" required />
+                </div>
+                
+                <div className="form-grid-2">
+                  <div className="form-group">
+                    <label>Categoría</label>
+                    {loadingCategorias ? <p>Cargando...</p> : (
+                      <select name="idCategoria" value={formData.idCategoria} onChange={handleChange} required>
+                        <option value="">-- Selecciona --</option>
+                        {categorias.map((cat) => (
+                          <option key={cat.IdCategoria} value={cat.IdCategoria}>{cat.NombreCategoria}</option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label>Teléfono</label>
+                    <input type="tel" name="telefonoContacto" value={formData.telefonoContacto} onChange={handleChange} />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Dirección</label>
+                  <input type="text" name="direccion" value={formData.direccion} onChange={handleChange} />
+                </div>
+
+                <div className="form-group">
+                  <label>Descripción</label>
+                  <textarea name="descripcion" value={formData.descripcion} onChange={handleChange} rows="3" />
+                </div>
+
+                {/* BOTÓN HORARIO */}
+                <div className="form-group">
+                  <label style={{marginBottom: '5px', display:'block'}}>Horario de Atención</label>
+                  <button type="button" className="btn-config-horario" onClick={() => setShowScheduleModal(true)}>
+                    <FaCalendarAlt /> Configurar Días y Horas
+                  </button>
+                  <div className="horario-resumen">
+                    {activeDays === 0 ? "Cerrado (Sin configurar)" : `${activeDays} días activos.`}
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Email Público</label>
+                  <input type="email" name="correoContacto" value={formData.correoContacto} onChange={handleChange} />
+                </div>
+
+                <div className="form-grid-2">
+                  <div className="form-group">
+                    <label>Latitud</label>
+                    <input type="number" name="coordenadasLat" value={formData.coordenadasLat} onChange={handleChange} step="any" />
+                  </div>
+                  <div className="form-group">
+                    <label>Longitud</label>
+                    <input type="number" name="coordenadasLng" value={formData.coordenadasLng} onChange={handleChange} step="any" />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Logo / Imagen</label>
+                  <input type="file" accept="image/*" onChange={handleFileChange} disabled={uploading} />
+                  {uploading && <small style={{color:'blue'}}>Subiendo...</small>}
+                  {formData.linkUrl && (
+                    <img src={formData.linkUrl} alt="Preview" style={{width:'100px', marginTop:'10px', borderRadius:'8px', border:'1px solid #ddd'}} />
+                  )}
+                </div>
+              </fieldset>
+
+              <button type="submit" className="btn-submit-registro" disabled={loading || uploading}>
+                {loading ? "Creando cuenta..." : "Registrar Negocio"}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        {/* MODAL DE HORARIO */}
+        {showScheduleModal && (
+          <div className="modal-horario-overlay" onClick={() => setShowScheduleModal(false)}>
+            <div className="modal-horario-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-horario-header">
+                <h3>Configurar Horario</h3>
+                <button className="btn-close-modal" onClick={() => setShowScheduleModal(false)}>✕</button>
+              </div>
+              <div className="horario-grid">
+                {horario.map((dia, idx) => (
+                  <div key={dia.dia} className={`horario-row ${dia.activo ? 'activo' : ''}`}>
+                    <div className="horario-check">
+                      <input type="checkbox" checked={dia.activo} onChange={(e) => handleHorarioChange(idx, 'activo', e.target.checked)} />
+                      <span>{dia.dia}</span>
+                    </div>
+                    <div className="horario-horas">
+                      <FaClock size={12} color="#999" style={{marginRight:'5px'}}/>
+                      <input type="time" value={dia.inicio} disabled={!dia.activo} onChange={(e) => handleHorarioChange(idx, 'inicio', e.target.value)} />
+                      <span>-</span>
+                      <input type="time" value={dia.fin} disabled={!dia.activo} onChange={(e) => handleHorarioChange(idx, 'fin', e.target.value)} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button type="button" className="btn-save-horario" onClick={() => setShowScheduleModal(false)}>Confirmar</button>
+            </div>
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
