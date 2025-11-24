@@ -20,6 +20,7 @@ import GestionCuenta from "./components/pages/personalNearbiz/GestionCuenta.jsx"
 import GestionUsuarios from "./components/pages/personalNearbiz/GestionUsuarios.jsx";
 import GestionMembresias from "./components/pages/personalNearbiz/GestionMembresias.jsx";
 import GestionCitas from "./components/pages/personalNearbiz/GestionCitas.jsx";
+import ServiciosNegocio from "./components/pages/personalNearbiz/GestionServicios.jsx";
 
 export default function App() {
   return (
@@ -117,6 +118,14 @@ export default function App() {
                 tecnicoActualId={null}
                 useRoleEndpoint={true}
               />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/servicios-negocio"
+          element={
+            <RoleGuard allow={["adminNegocio", "personal"]}>
+              <ServiciosNegocio/>
             </RoleGuard>
           }
         />

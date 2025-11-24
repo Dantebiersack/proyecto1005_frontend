@@ -12,6 +12,7 @@ import {
   MdAssignment,
   MdClose,
   MdCreditCard,
+  MdNewspaper,
 } from "react-icons/md";
 const sections = [
   {
@@ -76,6 +77,12 @@ const sections = [
         label: "Citas",
         roles: ["adminNearbiz", "personal", "adminNegocio"],
         Icon: MdEvent,
+      },
+      {
+        to: "/servicios-negocio",
+        label: "Servicios",
+        roles: ["personal", "adminNegocio"],
+        Icon: MdNewspaper,
       },
       {
         to: "/valoraciones",
