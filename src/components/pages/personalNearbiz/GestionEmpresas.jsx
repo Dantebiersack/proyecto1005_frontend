@@ -9,10 +9,11 @@ import {
 import api from "../../../services/api"; 
 import { useAuth } from "../../../auth/AuthContext";
 import { uploadImage } from "../../../services/storageService"; 
-import "./GestionEmpresas.css"; 
+import "./GestionUsuarios.css"; 
 import { FaPlus } from "react-icons/fa";
+import Swal from "sweetalert2"; // 👈 Importamos SweetAlert
 
-
+// Estado inicial del formulario
 const FORM_INICIAL = {
   nombre: "",
   idCategoria: "",
@@ -31,18 +32,17 @@ export default function GestionEmpresas() {
   const [negocios, setNegocios] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  
   const [search, setSearch] = useState("");
-  const [filterCategoria, setFilterCategoria] = useState(""); 
   
-  // Estados del Modal
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [formData, setFormData] = useState(FORM_INICIAL);
+  
   const [uploading, setUploading] = useState(false);
 
-  
+  // ============================
+  // CARGA INICIAL
+  // ============================
   useEffect(() => {
     cargarDatos();
   }, []);
@@ -58,6 +58,7 @@ export default function GestionEmpresas() {
       setCategorias(listaCategorias);
     } catch (err) {
       console.error("Error cargando datos", err);
+      Swal.fire("Error", "No se pudo cargar la lista de empresas", "error");
     } finally {
       setLoading(false);
     }
@@ -68,7 +69,9 @@ export default function GestionEmpresas() {
     return cat ? cat.NombreCategoria : "Sin categoría";
   };
 
- 
+  // ============================
+  // MANEJADORES
+  // ============================
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -78,13 +81,15 @@ export default function GestionEmpresas() {
       setFormData((prev) => ({ ...prev, linkUrl: publicUrl }));
     } catch (err) {
       console.error(err);
-      alert("Error al subir imagen");
+      Swal.fire("Error", "No se pudo subir la imagen", "error");
     } finally {
       setUploading(false);
     }
   };
 
- 
+  // ============================
+  // MODALES
+  // ============================
   function openNew() {
     setEditing(null);
     setFormData(FORM_INICIAL);
@@ -94,7 +99,6 @@ export default function GestionEmpresas() {
   function openEdit(negocio) {
     setEditing(negocio);
     
-   
     let horarioSafe = negocio.HorarioAtencion;
     if (typeof horarioSafe === 'object' && horarioSafe !== null) {
         horarioSafe = JSON.stringify(horarioSafe);
@@ -114,10 +118,16 @@ export default function GestionEmpresas() {
     setShowForm(true);
   }
 
- 
+  // ============================
+  // GUARDAR
+  // ============================
   async function handleSubmit(e) {
     e.preventDefault();
-    
+
+    // Validaciones básicas
+    if (!formData.nombre || !formData.idCategoria) {
+      return Swal.fire("Campos vacíos", "Por favor completa el nombre y la categoría.", "warning");
+    }
     
     let horarioFinal = null;
     if (editing) {
@@ -131,7 +141,7 @@ export default function GestionEmpresas() {
       TelefonoContacto: formData.telefonoContacto,
       CorreoContacto: formData.correoContacto,
       Descripcion: formData.descripcion,
-      HorarioAtencion: horarioFinal,
+      HorarioAtencion: horarioFinal, 
       LinkUrl: formData.linkUrl,
       CoordenadasLat: parseFloat(formData.coordenadasLat),
       CoordenadasLng: parseFloat(formData.coordenadasLng),
@@ -141,45 +151,80 @@ export default function GestionEmpresas() {
     try {
       if (editing) {
         await updateNegocio(editing.IdNegocio, dto);
+        Swal.fire("Actualizado", "La empresa ha sido actualizada correctamente.", "success");
       } else {
         await createNegocio(dto);
+        Swal.fire("Creado", "La nueva empresa ha sido registrada.", "success");
       }
       setShowForm(false);
       await cargarDatos(); 
     } catch (err) {
       console.error(err);
-      alert("No se pudo guardar el negocio");
+      Swal.fire("Error", "No se pudo guardar el negocio.", "error");
     }
   }
 
-
+  // ============================
+  // ACCIONES (Con SweetAlert)
+  // ============================
   async function handleDelete(negocio) {
-    if (!window.confirm(`¿Desactivar el negocio "${negocio.Nombre}"?`)) return;
-    await deleteNegocio(negocio.IdNegocio);
-    await cargarDatos();
+    const result = await Swal.fire({
+      title: `¿Desactivar "${negocio.Nombre}"?`,
+      text: "La empresa dejará de aparecer en la aplicación.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, desactivar",
+      cancelButtonText: "Cancelar"
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await deleteNegocio(negocio.IdNegocio);
+        await cargarDatos();
+        Swal.fire("Desactivado", "La empresa ha sido desactivada.", "success");
+      } catch (err) {
+        Swal.fire("Error", "No se pudo desactivar la empresa.", "error");
+      }
+    }
   }
 
   async function handleRestore(negocio) {
-    if (!window.confirm(`¿Reactivar el negocio "${negocio.Nombre}"?`)) return;
-    await restoreNegocio(negocio.IdNegocio);
-    await cargarDatos();
+    const result = await Swal.fire({
+      title: `¿Reactivar "${negocio.Nombre}"?`,
+      text: "La empresa volverá a estar visible.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#2e7d32",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, activar",
+      cancelButtonText: "Cancelar"
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await restoreNegocio(negocio.IdNegocio);
+        await cargarDatos();
+        Swal.fire("Activado", "La empresa está activa nuevamente.", "success");
+      } catch (err) {
+        Swal.fire("Error", "No se pudo activar la empresa.", "error");
+      }
+    }
   }
 
-  
+  // ============================
+  // RENDER
+  // ============================
   const filtered = negocios.filter((n) => {
-    
-    const matchSearch = !search.trim() || (
-      (n.Nombre || "").toLowerCase().includes(search.toLowerCase()) ||
-      (n.CorreoContacto || "").toLowerCase().includes(search.toLowerCase())
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return (
+      (n.Nombre || "").toLowerCase().includes(q) ||
+      (n.CorreoContacto || "").toLowerCase().includes(q)
     );
-
-   
-    const matchCategoria = !filterCategoria || n.IdCategoria === Number(filterCategoria);
-
-    return matchSearch && matchCategoria;
   });
 
- 
   return (
     <div className="gestion-usuarios-page">
       <div className="gestion-header">
@@ -188,35 +233,16 @@ export default function GestionEmpresas() {
           <p>Administra los negocios registrados en la plataforma.</p>
         </div>
         <div className="gestion-actions">
-          
-        
-          <select 
-            className="nb-input"
-            value={filterCategoria}
-            onChange={(e) => setFilterCategoria(e.target.value)}
-            style={{ minWidth: "180px", cursor: "pointer" }}
-          >
-            <option value="">Todas las categorías</option>
-            {categorias.map((cat) => (
-              <option key={cat.IdCategoria} value={cat.IdCategoria}>
-                {cat.NombreCategoria}
-              </option>
-            ))}
-          </select>
-
-         
           <input
             className="nb-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar empresa..."
           />
-          
-         
-          {/* <button className="nb-btn-primary" onClick={openNew}>
+          <button className="nb-btn-primary" onClick={openNew}>
             <FaPlus size={12} style={{ marginRight: "6px" }} />
             Nueva Empresa
-          </button> */}
+          </button>
         </div>
       </div>
 
@@ -224,7 +250,8 @@ export default function GestionEmpresas() {
         <table className="gestion-table">
           <thead>
             <tr>
-              <th>Nombre</th>
+              <th>Nombre / Dirección</th> {/* Combiné nombre y dirección para ahorrar espacio */}
+              <th>Administrador</th>      {/* 👈 NUEVA COLUMNA */}
               <th>Categoría</th>
               <th>Contacto</th>
               <th>Estado</th>
@@ -233,14 +260,21 @@ export default function GestionEmpresas() {
           </thead>
           <tbody>
             {loading ? (
-              <tr key="loading"><td colSpan="5" className="text-center">Cargando...</td></tr>
+              <tr key="loading"><td colSpan="6" className="text-center">Cargando...</td></tr>
             ) : filtered.length ? (
               filtered.map((n) => (
                 <tr key={n.IdNegocio}>
                   <td>
-                    <div style={{ fontWeight: "bold" }}>{n.Nombre}</div>
+                    <div style={{ fontWeight: "bold", color: "#0a3d62" }}>{n.Nombre}</div>
                     <small style={{ color: "#666" }}>{n.Direccion}</small>
                   </td>
+                  
+                  {/* 👇 AQUÍ MOSTRAMOS AL DUEÑO 👇 */}
+                  <td>
+                    <div style={{ fontWeight: "600" }}>{n.AdminNombre}</div>
+                    <small style={{ color: "#555", fontSize: "0.8rem" }}>{n.AdminEmail}</small>
+                  </td>
+                  
                   <td>
                     <span className="badge-role">
                       {getNombreCategoria(n.IdCategoria)}
@@ -248,10 +282,14 @@ export default function GestionEmpresas() {
                   </td>
                   <td>
                     <div style={{ fontSize: "0.85rem" }}>{n.TelefonoContacto}</div>
-                    <div style={{ fontSize: "0.85rem", color: "#555" }}>{n.CorreoContacto}</div>
+                    {/* Opcional: Mostrar el correo público del negocio si es diferente al del admin */}
                   </td>
                   <td>
-                    {n.Estado ? <span className="badge-success">Activo</span> : <span className="badge-danger">Inactivo</span>}
+                    {n.Estado ? (
+                      <span className="badge-success">Activo</span>
+                    ) : (
+                      <span className="badge-danger">Inactivo</span>
+                    )}
                   </td>
                   <td>
                     <div className="row-actions">
@@ -266,13 +304,13 @@ export default function GestionEmpresas() {
                 </tr>
               ))
             ) : (
-              <tr key="empty"><td colSpan="5" className="text-center">No se encontraron negocios que coincidan.</td></tr>
+              <tr key="empty"><td colSpan="6" className="text-center">No se encontraron negocios.</td></tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* --- MODAL --- */}
+      {/* MODAL */}
       {showForm && (
         <div className="nb-modal-overlay" onClick={() => setShowForm(false)}>
           <div className="nb-modal" onClick={(e) => e.stopPropagation()}>
@@ -281,7 +319,7 @@ export default function GestionEmpresas() {
               <button className="nb-modal-close" onClick={() => setShowForm(false)}>✕</button>
             </div>
 
-            <div className="nb-modal-body"> {/* Usamos el contenedor con scroll */}
+            <div className="nb-modal-body">
                 <form id="empresaForm" onSubmit={handleSubmit}>
                 <label>Nombre del Negocio
                     <input value={formData.nombre} onChange={(e) => setFormData({...formData, nombre: e.target.value})} required />
@@ -338,7 +376,6 @@ export default function GestionEmpresas() {
 
             <div className="nb-modal-footer">
               <button type="button" className="nb-btn-secondary" onClick={() => setShowForm(false)}>Cancelar</button>
-              {/* Botón vinculado al formulario por ID */}
               <button type="submit" form="empresaForm" className="nb-btn-primary" disabled={uploading}>Guardar</button>
             </div>
           </div>
