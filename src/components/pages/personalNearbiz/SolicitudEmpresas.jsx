@@ -34,10 +34,9 @@ export default function SolicitudEmpresas() {
 
   const handleAprobar = async (id) => {
     if (!window.confirm("¿Seguro que deseas aprobar esta solicitud?")) return;
-
     try {
       await aprobarSolicitud(id);
-      alert("Solicitud aprobada. Se envió el correo correctamente.");
+      alert(" Solicitud aprobada y correo enviado.");
       cargarSolicitudes();
     } catch (err) {
       console.error(err);
@@ -56,49 +55,56 @@ export default function SolicitudEmpresas() {
       alert("Escribe un motivo para rechazar la solicitud.");
       return;
     }
-
     try {
       await rechazarSolicitud(idARechazar, motivoRechazo);
-      alert("Solicitud rechazada. Se envió el correo correctamente.");
+      alert(" Solicitud rechazada y correo enviado.");
       setModalAbierto(false);
       cargarSolicitudes();
     } catch (err) {
       console.error(err);
-      alert("Error al rechazar la solicitud.");
+      alert(" Error al rechazar la solicitud.");
     }
   };
 
-  if (loading) return <p>Cargando solicitudes...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <p className="loading">Cargando solicitudes...</p>;
+  if (error) return <p className="error">{error}</p>;
 
   return (
     <div className="solicitudes-container">
       <h2>Solicitudes de Registro de Empresas</h2>
 
       {solicitudes.length === 0 ? (
-        <p>No hay solicitudes pendientes.</p>
+        <p className="no-solicitudes">No hay solicitudes pendientes.</p>
       ) : (
-        solicitudes.map((s) => (
-          <div key={s.IdNegocio} className="solicitud-card">
-            <h3>{s.Nombre}</h3>
-            <p><strong>Correo:</strong> {s.CorreoContacto}</p>
-            <p><strong>Teléfono:</strong> {s.TelefonoContacto}</p>
-            <p><strong>Dirección:</strong> {s.Direccion || "Sin especificar"}</p>
-            <p><strong>Descripción:</strong> {s.Descripcion || "Sin descripción"}</p>
+        <div className="solicitudes-grid">
+          {solicitudes.map((s) => (
+            <div key={s.IdNegocio} className="solicitud-card">
+              <h3>{s.Nombre}</h3>
+              <p><strong>Correo:</strong> {s.CorreoContacto}</p>
+              <p><strong>Teléfono:</strong> {s.TelefonoContacto}</p>
+              <p><strong>Dirección:</strong> {s.Direccion || "Sin especificar"}</p>
+              <p><strong>Descripción:</strong> {s.Descripcion || "Sin descripción"}</p>
 
-            <div className="acciones">
-              <button className="btn-aprobar" onClick={() => handleAprobar(s.IdNegocio)}>
-                Aprobar
-              </button>
-              <button className="btn-rechazar" onClick={() => abrirModalRechazo(s.IdNegocio)}>
-                Rechazar
-              </button>
+              <div className="acciones">
+                <button
+                  className="btn-aprobar"
+                  onClick={() => handleAprobar(s.IdNegocio)}
+                >
+                  Aprobar
+                </button>
+                <button
+                  className="btn-rechazar"
+                  onClick={() => abrirModalRechazo(s.IdNegocio)}
+                >
+                  Rechazar
+                </button>
+              </div>
             </div>
-          </div>
-        ))
+          ))}
+        </div>
       )}
 
-      {/* Modal */}
+      {/* MODAL */}
       {modalAbierto && (
         <div className="modal-overlay">
           <div className="modal">
@@ -108,9 +114,11 @@ export default function SolicitudEmpresas() {
               value={motivoRechazo}
               onChange={(e) => setMotivoRechazo(e.target.value)}
             ></textarea>
-
             <div className="modal-buttons">
-              <button className="btn-cancelar" onClick={() => setModalAbierto(false)}>
+              <button
+                className="btn-cancelar"
+                onClick={() => setModalAbierto(false)}
+              >
                 Cancelar
               </button>
               <button className="btn-rechazar" onClick={handleRechazar}>
