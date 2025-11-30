@@ -13,6 +13,7 @@ import {
   MdClose,
   MdCreditCard,
   MdNewspaper,
+  MdLabel,
 } from "react-icons/md";
 const sections = [
   {
@@ -50,6 +51,12 @@ const sections = [
         Icon: MdCreditCard,
       },
       {
+        to: "/categorias",
+        label: "Categorías",
+        roles: ["adminNearbiz"],
+        Icon: MdLabel,
+      },
+      {
         to: "/gestion-citas",
         label: "Citas",
         roles: ["adminNearbiz"],
@@ -63,19 +70,19 @@ const sections = [
       {
         to: "/mi-empresa",
         label: "Mi empresa",
-        roles: ["adminNearbiz", "personal", "adminNegocio"],
+        roles: [ "personal", "adminNegocio"],
         Icon: MdBusiness,
       },
       {
         to: "/gestion-empleados",
         label: "Gestión empleados",
-        roles: ["adminNearbiz", "personal", "adminNegocio"],
+        roles: [ "personal", "adminNegocio"],
         Icon: MdGroup,
       },
       {
         to: "/citas",
         label: "Citas",
-        roles: ["adminNearbiz", "personal", "adminNegocio"],
+        roles: [ "personal", "adminNegocio"],
         Icon: MdEvent,
       },
       {
@@ -87,7 +94,7 @@ const sections = [
       {
         to: "/valoraciones",
         label: "Valoraciones",
-        roles: ["adminNearbiz", "personal", "adminNegocio"],
+        roles: [ "personal", "adminNegocio"],
         Icon: MdStarRate,
       },
     ],

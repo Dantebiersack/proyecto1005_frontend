@@ -11,6 +11,7 @@ import GestionEmpleados from "./components/pages/Negocio/GestionEmpleados.jsx";
 import Citas from "./components/pages/Negocio/CitasNegocio.jsx";
 import Valoraciones from "./components/pages/Negocio/Valoraciones.jsx";
 import RegistroEmpresa from "./components/pages/Negocio/RegistroEmpresa.jsx";
+import Categorias from "./components/pages/personalNearbiz/GestionCategorias.jsx";
 
 // Personal Nearbiz
 import GestionEmpresas from "./components/pages/personalNearbiz/GestionEmpresas.jsx";
@@ -47,6 +48,14 @@ export default function App() {
           element={
             <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
               <GestionPersonal />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/categorias"
+          element={
+            <RoleGuard allow={["adminNearbiz"]}>
+              <Categorias />
             </RoleGuard>
           }
         />
