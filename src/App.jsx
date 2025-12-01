@@ -22,122 +22,129 @@ import GestionMembresias from "./components/pages/personalNearbiz/GestionMembres
 import GestionCitas from "./components/pages/personalNearbiz/GestionCitas.jsx";
 import ServiciosNegocio from "./components/pages/personalNearbiz/GestionServicios.jsx";
 
+// ⭐ Footer agregado
+import Footer from "./Footer.jsx";
+
 export default function App() {
   return (
-    <Routes>
-      {/* 👇 aquí ya decide si landing o redirección */}
-      <Route path="/" element={<LandingOrHome />} />
+    <>
+      <Routes>
+        {/* 👇 aquí ya decide si landing o redirección */}
+        <Route path="/" element={<LandingOrHome />} />
 
-      <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<Login />} />
 
-      <Route path="/registro-empresa" element={<RegistroEmpresa />} />
+        <Route path="/registro-empresa" element={<RegistroEmpresa />} />
 
-      <Route element={<PrivateLayout />}>
-        {/* Personal */}
-        <Route
-          path="/gestion-empresas"
-          element={
-            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
-              <GestionEmpresas />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="/gestion-personal"
-          element={
-            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
-              <GestionPersonal />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="/gestion-membresias"
-          element={
-            <RoleGuard allow={["adminNearbiz"]}>
-              <GestionMembresias />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="/solicitudes-empresas"
-          element={
-            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
-              <SolicitudEmpresas />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="/gestion-cuenta"
-          element={
-            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
-              <GestionCuenta />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="/gestion-usuarios"
-          element={
-            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
-              <GestionUsuarios />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="/gestion-citas"
-          element={
-            <RoleGuard allow={["adminNearbiz"]}>
-              <GestionCitas />
-            </RoleGuard>
-          }
-        />
+        <Route element={<PrivateLayout />}>
+          {/* Personal */}
+          <Route
+            path="/gestion-empresas"
+            element={
+              <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+                <GestionEmpresas />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="/gestion-personal"
+            element={
+              <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+                <GestionPersonal />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="/gestion-membresias"
+            element={
+              <RoleGuard allow={["adminNearbiz"]}>
+                <GestionMembresias />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="/solicitudes-empresas"
+            element={
+              <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+                <SolicitudEmpresas />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="/gestion-cuenta"
+            element={
+              <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+                <GestionCuenta />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="/gestion-usuarios"
+            element={
+              <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+                <GestionUsuarios />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="/gestion-citas"
+            element={
+              <RoleGuard allow={["adminNearbiz"]}>
+                <GestionCitas />
+              </RoleGuard>
+            }
+          />
 
-        {/* Negocio */}
+          {/* Negocio */}
+          <Route
+            path="/mi-empresa"
+            element={
+              <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+                <MiEmpresa />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="/gestion-empleados"
+            element={
+              <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+                <GestionEmpleados />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="/citas"
+            element={
+              <RoleGuard allow={["adminNegocio", "personal"]}>
+                <Citas
+                  isSuperAdmin={false}
+                  tecnicoActualId={null}
+                  useRoleEndpoint={true}
+                />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="/servicios-negocio"
+            element={
+              <RoleGuard allow={["adminNegocio", "personal"]}>
+                <ServiciosNegocio />
+              </RoleGuard>
+            }
+          />
+          <Route
+            path="/valoraciones"
+            element={
+              <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
+                <Valoraciones />
+              </RoleGuard>
+            }
+          />
+        </Route>
+      </Routes>
 
-        <Route
-          path="/mi-empresa"
-          element={
-            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
-              <MiEmpresa />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="/gestion-empleados"
-          element={
-            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
-              <GestionEmpleados />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="/citas"
-          element={
-            <RoleGuard allow={["adminNegocio", "personal"]}>
-              <Citas
-                isSuperAdmin={false}
-                tecnicoActualId={null}
-                useRoleEndpoint={true}
-              />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="/servicios-negocio"
-          element={
-            <RoleGuard allow={["adminNegocio", "personal"]}>
-              <ServiciosNegocio/>
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="/valoraciones"
-          element={
-            <RoleGuard allow={["adminNearbiz", "personal", "adminNegocio"]}>
-              <Valoraciones />
-            </RoleGuard>
-          }
-        />
-      </Route>
-    </Routes>
+      {/* ⭐ Footer agregado sin afectar nada */}
+      <Footer />
+    </>
   );
 }

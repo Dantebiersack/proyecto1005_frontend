@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import NavbarInicio from "../Navbar/NavbarInicio.jsx"; // 🔧 ruta corregida
+import NavbarInicio from "../Navbar/NavbarInicio.jsx";
 import "./Inicio.css";
 
 export default function Inicio() {
@@ -8,10 +8,13 @@ export default function Inicio() {
   const [index, setIndex] = useState(0);
   const [modal, setModal] = useState(null);
 
+  /* ===========================
+         IMÁGENES DEL CARRUSEL
+     =========================== */
   const images = [
-    "https://www.elimparcial.com/resizer/v2/DCCKBIIT4ZALBOOLPZTAR52BGI.jpg?auth=cd496687fa19aeab85c6813df7bac72b36a94973776bfe9dadc771fcb8ad2b8f&smart=true&width=1200&height=800&quality=70",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTf_i1749kHYlSThnArAgqOf_9ehCpoMU0Prw&s",
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTTY5Rc1Uh9p_NbRU_6e4iUnVVHTQ-iRIpuSA&s",
+    "https://cdn-3.expansion.mx/dims4/default/6d3c446/2147483647/strip/true/crop/1347x778+0+0/resize/1200x693!/format/webp/quality/60/?url=https%3A%2F%2Fcherry-brightspot.s3.amazonaws.com%2F89%2Fb8%2F55cd36654da795d325a1cdb280e7%2Fistock-618049200.jpg",
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStPzJFfnRfEll3OnPruBW5N5BFrqzGsN2EGAj14Rh_dStPSrhuP4SZck9uH34-keqqvvg&usqp=CAU",
+    "https://www.shutterstock.com/image-photo/business-network-concept-human-video-260nw-2112385895.jpg",
   ];
 
   useEffect(() => {
@@ -19,32 +22,40 @@ export default function Inicio() {
       setIndex((prev) => (prev + 1) % images.length);
     }, 3500);
     return () => clearInterval(timer);
-  }, [images.length]); // 🔧 dependencias (o [] si prefieres)
+  }, [images.length]);
 
+  /* ===========================
+            TEXTOS
+     =========================== */
   const info = {
     nosotros: {
       title: "Sobre Nosotros",
       text:
-        "Somos una empresa que busca ayudarte a mantener organizadas tus citas con tus clientes, de modo que tengas todo al alcance de tus manos. Nuestra misión es simplificar la gestión de tu tiempo y fortalecer la relación con tus clientes mediante una plataforma intuitiva, rápida y segura. NearBiz nació para conectar negocios y personas de manera más eficiente, moderna y confiable.",
+        "Somos una empresa que busca ayudarte a mantener organizadas tus citas con tus clientes, de modo que tengas todo al alcance de tus manos. Nuestra misión es simplificar la gestión de tu tiempo y fortalecer la relación con tus clientes mediante una plataforma intuitiva, rápida y segura.",
     },
     ofrecemos: {
       title: "Qué te ofrecemos",
       text:
-        "Te ofrecemos la oportunidad de digitalizar tu negocio y formar parte de una red de empresas confiables. Con NearBiz podrás aumentar tu visibilidad, automatizar tus citas, ofrecer horarios flexibles y permitir que tus clientes agenden de forma rápida y segura. Además, tendrás acceso a métricas y herramientas para mejorar la atención en tu empresa y la satisfacción de tus clientes.",
+        "Digitaliza tu negocio, aumenta tu visibilidad, automatiza tus citas y permite que tus clientes agenden de forma rápida y segura. NearBiz te ofrece herramientas y métricas para mejorar el servicio y la relación con tus clientes.",
     },
     app: {
-      title: "Información de nuestra aplicación",
+      title: "Aplicación Móvil",
       text:
-        "Nuestra aplicación móvil permite que tus clientes te encuentren fácilmente por ubicación y agenden citas contigo sin complicaciones. Todo dentro de un entorno seguro, moderno y personalizado. Con NearBiz, tu negocio estará más cerca que nunca de tus clientes y tu gestión será más simple que nunca.",
+        "Nuestra app permite que tus clientes te encuentren rápidamente por ubicación y agenden citas sin complicaciones, dentro de un entorno seguro y moderno.",
     },
   };
 
+  /* ===========================
+            RENDER
+     =========================== */
   return (
     <div className="inicio-container">
-      <NavbarInicio  />
+      <NavbarInicio />
 
-      {/* CARRUSEL */}
-      <div className="carrusel">
+      {/* ===========================
+              CARRUSEL
+          =========================== */}
+      <div className="carrusel pequeño">
         {images.map((img, i) => (
           <img
             key={i}
@@ -53,56 +64,61 @@ export default function Inicio() {
             className={`carrusel-img ${i === index ? "active" : ""}`}
           />
         ))}
+
         <div className="overlay">
           <h1 className="carrusel-title">
-            NearBiz: <span>No busques, encuentra.</span>
-            <br />
-            <small>Tu próxima cita te espera.</small>
+            NearBiz <br />
+            <span>No busques, encuentra</span>
           </h1>
         </div>
       </div>
 
-      {/* CUADROS INFORMATIVOS */}
-      <section className="info-section">
-        <div className="info-card" onClick={() => setModal("nosotros")}>
-          <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNvSbBRnx40soHLYHO5mhnbMJy5_bGhKn_Rg&s"
-            alt="Sobre Nosotros"
-          />
-          <h3>Sobre Nosotros</h3>
-        </div>
-
-        <div className="info-card" onClick={() => setModal("ofrecemos")}>
-          <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjG-3tyPAPD_K4JmwIFUwzLnTyMq6_B-hQxQ&s"
-            alt="Qué te ofrecemos"
-          />
-          <h3>Qué te ofrecemos</h3>
-        </div>
-
-        <div className="info-card" onClick={() => setModal("app")}>
-          <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOCm3DqsYqw3iAmXRNhtvgSwgaXuaqq2vnnA&s"
-            alt="App"
-          />
-          <h3>Información de nuestra app</h3>
-        </div>
+      {/* ===========================
+            TARJETAS INFORMATIVAS
+          =========================== */}
+      <section className="info-section nueva">
+        {Object.keys(info).map((key) => (
+          <div
+            className="info-card nueva-card"
+            key={key}
+            onClick={() => setModal(key)}
+          >
+            <img
+              src={
+                key === "nosotros"
+                  ? "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                  : key === "ofrecemos"
+                  ? "https://cdn-icons-png.flaticon.com/512/7915/7915523.png"
+                  : "https://cdn-icons-png.flaticon.com/128/3437/3437364.png"
+              }
+              alt={info[key].title}
+            />
+            <h3>{info[key].title}</h3>
+          </div>
+        ))}
       </section>
 
-      {/* BOTONES ABAJO */}
-      <div className="hero-buttons">
-        <button className="btn-primary" onClick={() => navigate("/membresias")}>
-          Ver Membresías
-        </button>
+      {/* ===========================
+                CTA FINAL
+          =========================== */}
+      <div className="cta-box">
+        <h2>Bienvenido a NearBiz</h2>
+        <p>
+          Únete a nuestra red de negocios digitales.  
+          Envía tu solicitud de registro y recibe en tu correo los accesos para administrar tu empresa.
+        </p>
+
         <button
-          className="btn-secondary"
+          className="cta-btn"
           onClick={() => navigate("/registro-empresa")}
         >
-          Registrar mi Empresa
+          Enviar solicitud de registro de mi empresa
         </button>
       </div>
 
-      {/* MODAL */}
+      {/* ===========================
+                MODAL
+          =========================== */}
       {modal && (
         <div className="modal-overlay" onClick={() => setModal(null)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>

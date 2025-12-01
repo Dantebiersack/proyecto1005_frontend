@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MdMenu } from "react-icons/md";
+import { MdMenu, MdHome, MdLogin } from "react-icons/md";
 import { useAuth } from "../../auth/AuthContext";
 import "./NavbarInicio.css";
 
@@ -35,8 +35,15 @@ function NavbarInicio({ onMenuClick }) {
           </div>
         ) : (
           <nav className="navbar-links">
-            <Link to="/">Inicio</Link>
-            <Link to="/login">Iniciar sesión</Link>
+            <Link to="/">
+              <MdHome size={20} style={{ marginRight: "6px" }} />
+              Inicio
+            </Link>
+
+            <Link to="/login">
+              <MdLogin size={20} style={{ marginRight: "6px" }} />
+              Iniciar sesión
+            </Link>
           </nav>
         )}
       </div>

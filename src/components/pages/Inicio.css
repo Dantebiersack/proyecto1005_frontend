@@ -1,4 +1,4 @@
-/* 🔹 RESETEO GENERAL */
+/* ========== RESETEO ========== */
 * {
   margin: 0;
   padding: 0;
@@ -6,82 +6,33 @@
 }
 
 body {
-  margin: 0;
-  background: #ecf0f3;
-}
-
-html, body, #root{
-  width: 100%;
-  height: 100%;
-  overflow-x: hidden;
-  background-color: #f4f8fb;
+  background: #255b95;
   font-family: "Poppins", sans-serif;
 }
 
-/* 🔹 CONTENEDOR PRINCIPAL */
+/* ========== CONTENEDOR GENERAL ========== */
 .inicio-container {
-  width: 100%;
-  overflow-x: hidden;
-  background-color: #f4f8fb;
-  color: #0a3d62;
-}
-
-/* 🔹 NAVBAR */
-.navbar-inicio {
-  width: 100%;
-  background-color: #0a3d62;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 999;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-}
-
-.navbar-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.8rem 2rem;
-}
-
-.navbar-logo {
-  height: 60px;
-  border-radius: 10px;
-}
-
-.navbar-links {
-  display: flex;
-  gap: 2rem;
-}
-
-.navbar-links a {
-  color: white;
-  text-decoration: none;
-  font-size: 1.1rem;
-  font-weight: 500;
-  transition: 0.3s;
-}
-
-.navbar-links a:hover {
-  color: #74b9ff;
-}
-
-/* 🔹 CARRUSEL */
-.carrusel {
-  position: relative;
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ========== CARRUSEL MEJORADO ========== */
+.carrusel.pequeño {
+  width: 100vw;
+  height: 62vh; /* SE VE MÁS COMPLETO */
+  margin-top: 60px; /* Subido */
+  position: relative;
   overflow: hidden;
-  margin-top: 80px;
 }
 
 .carrusel-img {
-  position: absolute;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  position: absolute;
   opacity: 0;
-  transition: opacity 1s ease-in-out;
+  transition: opacity 1.4s ease-in-out;
 }
 
 .carrusel-img.active {
@@ -91,157 +42,178 @@ html, body, #root{
 .overlay {
   position: absolute;
   top: 0;
-  left: 0;
-  height: 100%;
   width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    rgba(5, 35, 80, 0.45),
+    rgba(5, 35, 80, 0.65)
+  );
   display: flex;
-  align-items: center;
   justify-content: center;
-  text-align: center;
-  color: white;
-  background: rgba(0, 35, 69, 0.45);
-}
-
-@keyframes fadeInUp {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
+  align-items: center;
 }
 
 .carrusel-title {
-  font-size: 2.8rem;
-  line-height: 1.4;
+  color: white;
+  text-align: center;
+  font-size: 3rem;
   font-weight: 700;
-  padding: 1rem;
-  animation: fadeInUp 2s ease-in-out;
+  letter-spacing: 1px;
+  animation: fadeIn 2s ease;
 }
 
 .carrusel-title span {
-  color: #74b9ff;
+  color: #6ec8ff;
 }
 
-/* 🔹 CUADROS DE INFORMACIÓN - TAMAÑO MODERADO */
-.info-section {
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========== TARJETAS ESTILO PREMIUM ========== */
+.info-section.nueva {
+  width: 100vw;
+  padding: 4.5rem 1rem;
   display: flex;
   justify-content: center;
-  gap: 2rem;
   flex-wrap: wrap;
-  padding: 3.5rem 1rem;
-  background: #eaf3ff;
+  gap: 2.8rem;
 }
 
-.info-card {
-  width: 300px; /* un poco más grande que antes */
-  background: rgb(78, 146, 188);
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s;
+.nueva-card {
+  width: 280px;
+  background: rgb(173, 206, 239);
+  border-radius: 22px;
+  padding-bottom: 1.7rem;
   text-align: center;
-}
-
-.info-card img {
-  width: 100%;
-  height: 200px; /* imagen ligeramente más alta */
-  object-fit: cover;
-}
-
-.info-card h3 {
-  padding: 1.2rem 1rem;
-  font-size: 1.2rem;
-  color: #ffffff;
-}
-
-.info-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 24px rgba(0,0,0,0.22);
-}
-
-
-/* 🔹 BOTONES ABAJO */
-.hero-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  margin: 3rem 0;
-  flex-wrap: wrap;
-}
-
-.hero-buttons .btn-primary,
-.hero-buttons .btn-secondary {
-  padding: 0.8rem 1.8rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  border-radius: 10px;
   cursor: pointer;
   transition: 0.3s ease;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.10);
+  border: 2px solid #dfe9f7;
+  animation: fadeIn 1s ease;
+}
+
+.nueva-card img {
+  width: 110px;
+  margin-top: 22px;
+}
+
+.nueva-card h3 {
+  margin-top: 1rem;
+  font-size: 1.35rem;
+  color: #062f5a;
+  font-weight: bold;
+}
+
+.nueva-card:hover {
+  transform: translateY(-7px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+  border-color: #6ec8ff;
+}
+
+/* ========== CAJA FINAL CTA ========== */
+.cta-box {
+  width: 92vw;
+  max-width: 720px;
+  margin: 2rem auto 4rem auto;
+  background: rgb(8, 59, 126);
+  padding: 3rem 2rem;
+  border-radius: 22px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+  border: 2px solid #dfe9f7;
+  animation: fadeIn 1.2s ease;
+}
+
+.cta-box h2 {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  color: #feffff;
+  font-weight: 700;
+}
+
+.cta-box p {
+  font-size: 1.15rem;
+  color: #f7f7f7;
+  margin-bottom: 1.7rem;
+  line-height: 1.6;
+}
+
+.cta-btn {
+  background: #0a6fd8;
+  color: white;
+  padding: 1rem 2.3rem;
   border: none;
+  border-radius: 14px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
 }
 
-.hero-buttons .btn-primary {
-  background-color: #0984e3;
-  color: white;
+.cta-btn:hover {
+  background: #6ec8ff;
+  transform: translateY(-2px);
 }
 
-.hero-buttons .btn-primary:hover {
-  background-color: #74b9ff;
-}
-
-.hero-buttons .btn-secondary {
-  background-color: #00b894;
-  color: white;
-}
-
-.hero-buttons .btn-secondary:hover {
-  background-color: #55efc4;
-}
-
-/* 🔹 MODAL */
+/* ========== MODAL PREMIUM ========== */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.35);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2000;
+  z-index: 3000;
 }
 
 .modal-content {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 15px;
+  background: #fcfcfc;
+  border-radius: 20px;
   width: 90%;
   max-width: 600px;
+  padding: 2.5rem;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  border: 2px solid #6ec8ff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.20);
+  animation: popUp 0.35s ease-out;
+}
+
+@keyframes popUp {
+  from { transform: scale(0.85); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
 }
 
 .modal-content h2 {
-  color: #0984e3;
+  color: #0a6fd8;
+  font-size: 1.9rem;
+  margin-bottom: 1rem;
 }
 
 .modal-content p {
-  margin-top: 1rem;
-  color: #2d3436;
-  font-size: 1rem;
-  line-height: 1.6;
+  color: #222;
+  font-size: 1.1rem;
+  line-height: 1.55;
 }
 
 .modal-content button {
-  margin-top: 1.5rem;
-  padding: 0.6rem 1.2rem;
-  border: none;
-  background-color: #0984e3;
+  margin-top: 1.6rem;
+  padding: 0.8rem 1.5rem;
+  background: #0a6fd8;
   color: white;
-  border-radius: 10px;
+  border: none;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 1rem;
+  transition: 0.3s;
 }
 
 .modal-content button:hover {
-  background-color: #74b9ff;
+  background: #6ec8ff;
 }

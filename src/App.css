@@ -1,8 +1,23 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* ⛔ Se quitó display:flex para evitar recortes */
 body {
   font-family: 'Poppins', sans-serif;
-  margin: 0;
   background: #f8f9fa;
   color: #222;
+  min-height: 100vh;
+}
+
+/* ⭐ Asegura que TODAS las vistas de React ocupen el 100% */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: block;
 }
 
 .header {
@@ -38,9 +53,12 @@ body {
   color: #00cec9;
 }
 
+/* ⭐ Ya no se recortará el contenido */
 .main-content {
   padding: 2rem;
-  min-height: 70vh;
+  width: 100%;
+  flex: 1;
+  box-sizing: border-box;
 }
 
 .footer {
@@ -55,5 +73,5 @@ body {
 }
 
 body.swal2-height-auto {
-  height: 100% !important
+  height: 100% !important;
 }

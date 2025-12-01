@@ -250,8 +250,7 @@ export default function GestionEmpresas() {
         <table className="gestion-table">
           <thead>
             <tr>
-              <th>Nombre / Dirección</th> {/* Combiné nombre y dirección para ahorrar espacio */}
-              <th>Administrador</th>      {/* 👈 NUEVA COLUMNA */}
+              <th>Nombre</th>
               <th>Categoría</th>
               <th>Contacto</th>
               <th>Estado</th>
@@ -260,21 +259,16 @@ export default function GestionEmpresas() {
           </thead>
           <tbody>
             {loading ? (
-              <tr key="loading"><td colSpan="6" className="text-center">Cargando...</td></tr>
+              <tr key="loading">
+                <td colSpan="5" className="text-center">Cargando...</td>
+              </tr>
             ) : filtered.length ? (
               filtered.map((n) => (
                 <tr key={n.IdNegocio}>
                   <td>
-                    <div style={{ fontWeight: "bold", color: "#0a3d62" }}>{n.Nombre}</div>
+                    <div style={{ fontWeight: "bold" }}>{n.Nombre}</div>
                     <small style={{ color: "#666" }}>{n.Direccion}</small>
                   </td>
-                  
-                  {/* 👇 AQUÍ MOSTRAMOS AL DUEÑO 👇 */}
-                  <td>
-                    <div style={{ fontWeight: "600" }}>{n.AdminNombre}</div>
-                    <small style={{ color: "#555", fontSize: "0.8rem" }}>{n.AdminEmail}</small>
-                  </td>
-                  
                   <td>
                     <span className="badge-role">
                       {getNombreCategoria(n.IdCategoria)}
@@ -282,7 +276,7 @@ export default function GestionEmpresas() {
                   </td>
                   <td>
                     <div style={{ fontSize: "0.85rem" }}>{n.TelefonoContacto}</div>
-                    {/* Opcional: Mostrar el correo público del negocio si es diferente al del admin */}
+                    <div style={{ fontSize: "0.85rem", color: "#555" }}>{n.CorreoContacto}</div>
                   </td>
                   <td>
                     {n.Estado ? (
@@ -293,18 +287,26 @@ export default function GestionEmpresas() {
                   </td>
                   <td>
                     <div className="row-actions">
-                      <button className="nb-btn-small" onClick={() => openEdit(n)}>Editar</button>
+                      <button className="nb-btn-small" onClick={() => openEdit(n)}>
+                        Editar
+                      </button>
                       {n.Estado ? (
-                        <button className="nb-btn-small danger" onClick={() => handleDelete(n)}>Desactivar</button>
+                        <button className="nb-btn-small danger" onClick={() => handleDelete(n)}>
+                          Desactivar
+                        </button>
                       ) : (
-                        <button className="nb-btn-small success" onClick={() => handleRestore(n)}>Activar</button>
+                        <button className="nb-btn-small success" onClick={() => handleRestore(n)}>
+                          Activar
+                        </button>
                       )}
                     </div>
                   </td>
                 </tr>
               ))
             ) : (
-              <tr key="empty"><td colSpan="6" className="text-center">No se encontraron negocios.</td></tr>
+              <tr key="empty">
+                <td colSpan="5" className="text-center">No se encontraron negocios.</td>
+              </tr>
             )}
           </tbody>
         </table>
