@@ -97,6 +97,12 @@ const sections = [
         roles: [ "personal", "adminNegocio"],
         Icon: MdStarRate,
       },
+       {
+      to: "/gestion-cuenta",
+      label: "Gestión de cuenta",
+      roles: ["personal", "adminNegocio"],
+      Icon: MdManageAccounts,
+    },
     ],
   },
 ];
