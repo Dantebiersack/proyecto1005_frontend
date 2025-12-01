@@ -11,6 +11,7 @@ import GestionEmpleados from "./components/pages/Negocio/GestionEmpleados.jsx";
 import Citas from "./components/pages/Negocio/CitasNegocio.jsx";
 import Valoraciones from "./components/pages/Negocio/Valoraciones.jsx";
 import RegistroEmpresa from "./components/pages/Negocio/RegistroEmpresa.jsx";
+import Categorias from "./components/pages/personalNearbiz/GestionCategorias.jsx";
 
 // Personal Nearbiz
 import GestionEmpresas from "./components/pages/personalNearbiz/GestionEmpresas.jsx";
@@ -29,14 +30,13 @@ export default function App() {
   return (
     <>
       <Routes>
-        {/* 👇 aquí ya decide si landing o redirección */}
         <Route path="/" element={<LandingOrHome />} />
-
         <Route path="/login" element={<Login />} />
-
         <Route path="/registro-empresa" element={<RegistroEmpresa />} />
 
+        {/* Rutas privadas */}
         <Route element={<PrivateLayout />}>
+
           {/* Personal */}
           <Route
             path="/gestion-empresas"
@@ -46,6 +46,7 @@ export default function App() {
               </RoleGuard>
             }
           />
+
           <Route
             path="/gestion-personal"
             element={
@@ -54,6 +55,17 @@ export default function App() {
               </RoleGuard>
             }
           />
+
+          {/* 👍 Esta ruta venía SOLO en el código de tu compañero */}
+          <Route
+            path="/categorias"
+            element={
+              <RoleGuard allow={["adminNearbiz"]}>
+                <Categorias />
+              </RoleGuard>
+            }
+          />
+
           <Route
             path="/gestion-membresias"
             element={
@@ -62,6 +74,7 @@ export default function App() {
               </RoleGuard>
             }
           />
+
           <Route
             path="/solicitudes-empresas"
             element={
@@ -70,6 +83,7 @@ export default function App() {
               </RoleGuard>
             }
           />
+
           <Route
             path="/gestion-cuenta"
             element={
@@ -78,6 +92,7 @@ export default function App() {
               </RoleGuard>
             }
           />
+
           <Route
             path="/gestion-usuarios"
             element={
@@ -86,6 +101,7 @@ export default function App() {
               </RoleGuard>
             }
           />
+
           <Route
             path="/gestion-citas"
             element={
@@ -104,6 +120,7 @@ export default function App() {
               </RoleGuard>
             }
           />
+
           <Route
             path="/gestion-empleados"
             element={
@@ -112,6 +129,7 @@ export default function App() {
               </RoleGuard>
             }
           />
+
           <Route
             path="/citas"
             element={
@@ -124,6 +142,7 @@ export default function App() {
               </RoleGuard>
             }
           />
+
           <Route
             path="/servicios-negocio"
             element={
@@ -132,6 +151,7 @@ export default function App() {
               </RoleGuard>
             }
           />
+
           <Route
             path="/valoraciones"
             element={
@@ -140,10 +160,11 @@ export default function App() {
               </RoleGuard>
             }
           />
+
         </Route>
       </Routes>
 
-      {/* ⭐ Footer agregado sin afectar nada */}
+      {/* Footer */}
       <Footer />
     </>
   );
