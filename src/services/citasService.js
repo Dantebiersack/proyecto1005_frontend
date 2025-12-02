@@ -37,3 +37,7 @@ export async function approveCita(id) {
   // Endpoint nuevo recomendado en backend: PATCH /Citas/{id}/approve
   return api.patch(`/Citas/${id}/approve`);
 }
+
+export async function updateCitaStatus(id, estatus, motivo) {
+  return api.patch(`/Citas/${id}/estatus`, { estatus, motivo });
+}
