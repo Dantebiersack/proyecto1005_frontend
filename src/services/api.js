@@ -3,6 +3,7 @@ import axios from "axios";
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "https://nearbizbackend3.vercel.app/api/",
  //Devolvemos el api original 
+
 });
 
 // Leer token del storage

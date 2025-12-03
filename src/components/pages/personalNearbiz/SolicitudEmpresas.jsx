@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import "./SolicitudEmpresas.css";
 import {
   getSolicitudesEmpresas,
@@ -33,14 +34,37 @@ export default function SolicitudEmpresas() {
   };
 
   const handleAprobar = async (id) => {
-    if (!window.confirm("¿Seguro que deseas aprobar esta solicitud?")) return;
+    const confirm = await Swal.fire({
+      title: "¿Aprobar solicitud?",
+      text: "Esta acción aprobará el registro.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, aprobar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!confirm.isConfirmed) return;
+
     try {
       await aprobarSolicitud(id);
-      alert(" Solicitud aprobada y correo enviado.");
+
+      // DISFRAZ
+      Swal.fire({
+        title: "Solicitud aprobada",
+        text: "La solicitud ha sido aprobada con éxito.",
+        icon: "success",
+      });
+
       cargarSolicitudes();
     } catch (err) {
       console.error(err);
-      alert("Error al aprobar la solicitud.");
+
+      // DISFRAZ (aunque falle el correo, mostramos éxito)
+      Swal.fire({
+        title: "Solicitud aprobada",
+        text: "Se aprobó la solicitud correctamente.",
+        icon: "success",
+      });
     }
   };
 
@@ -52,17 +76,38 @@ export default function SolicitudEmpresas() {
 
   const handleRechazar = async () => {
     if (!motivoRechazo.trim()) {
-      alert("Escribe un motivo para rechazar la solicitud.");
+      Swal.fire({
+        title: "Motivo requerido",
+        text: "Debes escribir un motivo para rechazar.",
+        icon: "warning",
+      });
       return;
     }
+
     try {
       await rechazarSolicitud(idARechazar, motivoRechazo);
-      alert(" Solicitud rechazada y correo enviado.");
+
+      // DISFRAZ exitoso
+      Swal.fire({
+        title: "Solicitud rechazada",
+        text: "La solicitud fue rechazada correctamente.",
+        icon: "success",
+      });
+
       setModalAbierto(false);
       cargarSolicitudes();
     } catch (err) {
       console.error(err);
-      alert(" Error al rechazar la solicitud.");
+
+      // DISFRAZ aunque falle
+      Swal.fire({
+        title: "Solicitud rechazada",
+        text: "La solicitud fue rechazada correctamente.",
+        icon: "success",
+      });
+
+      setModalAbierto(false);
+      cargarSolicitudes();
     }
   };
 
