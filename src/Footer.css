@@ -5,6 +5,7 @@
   padding: 3rem 1rem 1.5rem;
   margin-top: 4rem;
   box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.15);
+  margin-top: 0 !important; /* Fuerza a 0 el margen superior */
 }
 
 .footer-container {
