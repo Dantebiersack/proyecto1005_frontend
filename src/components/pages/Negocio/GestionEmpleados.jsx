@@ -28,12 +28,15 @@ export default function GestionEmpleados() {
   const [empleados, setEmpleados] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false); 
+  
+  // --- FILTROS ---
   const [search, setSearch] = useState("");
+  const [filterEstado, setFilterEstado] = useState("all");
+
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null); 
   const [formData, setFormData] = useState(FORM_INICIAL);
 
-  // Identificar si el usuario logueado es solo "personal" (empleado)
   const isLoggedAsEmployee = user?.roles?.includes("personal");
 
   useEffect(() => {
@@ -103,10 +106,11 @@ export default function GestionEmpleados() {
     try {
       if (editing) {
         await updateUsuario(editing.idUsuario, {
-          Nombre: formData.nombre,
-          Email: formData.email, 
-          IdRol: editing.idRol, // Mantiene su rol de sistema original
+          nombre: formData.nombre, 
+          email: formData.email, 
+          idRol: editing.idRol, 
         });
+
         await updatePersonal(editing.idPersonal, {
           IdUsuario: editing.idUsuario, 
           RolEnNegocio: formData.rolEnNegocio,
@@ -115,18 +119,18 @@ export default function GestionEmpleados() {
         Swal.fire("Actualizado", "Datos actualizados correctamente.", "success");
 
       } else {
-        // Crear Usuario (Rol 3 = Personal)
         const nuevoUsuario = await createUsuario({
-          Nombre: formData.nombre,
-          Email: formData.email,
-          ContrasenaHash: formData.contrasena, 
-          IdRol: 3, 
-          Token: null,
+          nombre: formData.nombre,
+          email: formData.email,
+          contrasenaHash: formData.contrasena, 
+          idRol: 3,
+          token: null,
         });
         
-        // Vincular Personal
+        const idUsuarioCreado = nuevoUsuario.IdUsuario || nuevoUsuario.idUsuario;
+
         await createPersonal({
-          IdUsuario: nuevoUsuario.IdUsuario, 
+          IdUsuario: idUsuarioCreado, 
           RolEnNegocio: formData.rolEnNegocio,
         });
 
@@ -197,16 +201,19 @@ export default function GestionEmpleados() {
   }
 
   const filtered = empleados.filter((emp) => {
-    if (!search.trim()) return true;
-    const q = search.toLowerCase();
-    return (
-      (emp.nombre || "").toLowerCase().includes(q) ||
-      (emp.email || "").toLowerCase().includes(q) ||
-      (emp.rolEnNegocio || "").toLowerCase().includes(q)
+    const matchSearch = !search.trim() || (
+      (emp.nombre || "").toLowerCase().includes(search.toLowerCase()) ||
+      (emp.email || "").toLowerCase().includes(search.toLowerCase()) ||
+      (emp.rolEnNegocio || "").toLowerCase().includes(search.toLowerCase())
     );
+
+    let matchEstado = true;
+    if (filterEstado === "active") matchEstado = emp.estado === true;
+    if (filterEstado === "inactive") matchEstado = emp.estado === false;
+
+    return matchSearch && matchEstado;
   });
 
-  // 👇 Helper para saber si el usuario que estamos editando en el modal es Admin
   const isEditingAdmin = editing && (editing.rolEnNegocio === "Administrador" || editing.rolEnNegocio === "Dueño");
 
   return (
@@ -217,18 +224,31 @@ export default function GestionEmpleados() {
           <p>Administra el personal que puede aceptar citas en tu negocio.</p>
         </div>
         <div className="gestion-actions">
+
+          <select 
+            className="nb-input"
+            value={filterEstado}
+            onChange={(e) => setFilterEstado(e.target.value)}
+            style={{ minWidth: "120px", cursor: "pointer" }}
+          >
+            <option value="all">Todos</option>
+            <option value="active">Activos</option>
+            <option value="inactive">Inactivos</option>
+          </select>
+
           <input
             className="nb-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar..."
           />
-          {!isLoggedAsEmployee && (
-            <button className="nb-btn-primary" onClick={openNew}>
-              <FaPlus size={12} style={{ marginRight: "6px" }} />
-              Nuevo Empleado
-            </button>
-          )}
+
+          
+          <button className="nb-btn-primary" onClick={openNew}>
+            <FaPlus size={12} style={{ marginRight: "6px" }} />
+            Nuevo Empleado
+          </button>
+
         </div>
       </div>
 
@@ -248,7 +268,8 @@ export default function GestionEmpleados() {
               <tr key="loading-row"><td colSpan="5" className="text-center">Cargando...</td></tr>
             ) : filtered.length ? (
               filtered.map((emp) => {
-                const esAdminDeNegocio = emp.rolEnNegocio === "Administrador" || emp.rolEnNegocio === "Dueño";
+                const rolUpper = (emp.rolEnNegocio || "").toUpperCase();
+                const esAdminDeNegocio = rolUpper === "ADMINISTRADOR" || rolUpper === "DUEÑO";
                 const puedeEditar = !isLoggedAsEmployee || !esAdminDeNegocio;
 
                 return (
@@ -314,7 +335,6 @@ export default function GestionEmpleados() {
         </table>
       </div>
 
-      {/* MODAL */}
       {showForm && (
         <div className="nb-modal-overlay" onClick={() => setShowForm(false)}>
           <div className="nb-modal" onClick={(e) => e.stopPropagation()}>
@@ -323,6 +343,7 @@ export default function GestionEmpleados() {
               <button className="nb-modal-close" onClick={() => setShowForm(false)}>✕</button>
             </div>
             <form className="nb-modal-body" onSubmit={handleSubmit}>
+              
               <label>Nombre
                 <input value={formData.nombre} onChange={(e) => setFormData((f) => ({ ...f, nombre: e.target.value }))} required />
               </label>
@@ -354,7 +375,6 @@ export default function GestionEmpleados() {
                   onChange={(e) => setFormData((f) => ({ ...f, rolEnNegocio: e.target.value }))} 
                   placeholder="Ej: Estilista, Barbero" 
                   required 
-                  // 👇 AQUÍ ESTÁ LA PROTECCIÓN: Se deshabilita si editamos al admin
                   disabled={isEditingAdmin}
                   style={isEditingAdmin ? {backgroundColor: "#f0f0f0", color: "#888"} : {}}
                   title={isEditingAdmin ? "El rol de administrador no se puede cambiar aquí" : ""}
