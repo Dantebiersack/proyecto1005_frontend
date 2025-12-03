@@ -17,11 +17,11 @@ body {
   overflow-x: hidden;
 }
 
-/* ========== CARRUSEL MEJORADO ========== */
+/* ========== CARRUSEL MEJORADO (SUBIDO MÁS ARRIBA) ========== */
 .carrusel.pequeño {
   width: 100vw;
-  height: 62vh; /* SE VE MÁS COMPLETO */
-  margin-top: 60px; /* Subido */
+  height: 62vh;
+  margin-top: 0px; /* 🔥 ANTES 60px — AHORA MÁS ARRIBA */
   position: relative;
   overflow: hidden;
 }

@@ -10,18 +10,34 @@ export default function PrivateLayout() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
+  // 👇 esto evita que te regrese siempre
+  const [hasRedirected, setHasRedirected] = useState(false);
+
   useEffect(() => {
-    if (!user) navigate("/login", { replace: true });
-  }, [user, navigate]);
+    if (!user) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    // Si YA redirigimos, no lo volvemos a hacer
+    if (hasRedirected) return;
+
+    const roles = user.roles || [];
+
+    // SOLO redirigir al entrar por primera vez
+    if (roles.includes("adminNearbiz") || roles.includes("personal")) {
+      navigate("/solicitudes-empresas", { replace: true });
+      setHasRedirected(true); // ✔ evita loops
+    }
+
+  }, [user, navigate, hasRedirected]);
 
   if (!user) return null;
 
   return (
     <div className="nb-shell">
-      {/* header fijo arriba */}
       <NavbarInicio onMenuClick={() => setOpen(true)} user={user} />
 
-      {/* cuerpo: sidebar + content */}
       <div className="nb-main">
         <Sidebar open={open} onClose={() => setOpen(false)} />
         <main className="nb-content">
