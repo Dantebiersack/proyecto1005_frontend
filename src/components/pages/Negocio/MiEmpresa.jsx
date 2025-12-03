@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./MiEmpresa.css";
 import { getMiNegocio, getCategorias, updateNegocio } from "../../../services/miempresaService";
-import Swal from "sweetalert2"; // ⭐ AÑADIDO
+import Swal from "sweetalert2"; 
 
 const DIAS_SEMANA = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
 
@@ -55,7 +55,7 @@ export default function MiEmpresa() {
       const data = { ...formData, HorarioAtencion: JSON.stringify(horario) };
       await updateNegocio(formData.IdNegocio || "MiNegocio", data);
 
-      // ⭐ SWEETALERT2 DE ÉXITO
+     
       Swal.fire({
         title: "¡Datos actualizados!",
         text: "Tu información se guardó correctamente.",
@@ -70,7 +70,7 @@ export default function MiEmpresa() {
 
       console.error(err);
 
-      // ⭐ SWEETALERT2 DE ERROR
+     
       Swal.fire({
         title: "Error",
         text: "No se pudieron actualizar los datos.",

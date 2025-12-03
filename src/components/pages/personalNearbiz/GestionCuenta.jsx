@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { actualizarPerfil } from "../../../services/gestionCuentaService";
-import Swal from "sweetalert2";  // ⭐ AÑADIDO
+import Swal from "sweetalert2";  
 import "./GestionCuenta.css";
 
 export default function GestionCuenta() {
@@ -21,7 +21,7 @@ export default function GestionCuenta() {
     try {
       await actualizarPerfil(user.id, nombre, password);
 
-      // ⭐ ALERTA DE ÉXITO
+     
       Swal.fire({
         title: "Perfil actualizado",
         text: "Tus datos han sido actualizados correctamente.",
@@ -31,7 +31,7 @@ export default function GestionCuenta() {
 
     } catch (e) {
 
-      // ⭐ ALERTA DE ERROR
+    
       Swal.fire({
         title: "Error",
         text: "No se pudo actualizar el perfil.",

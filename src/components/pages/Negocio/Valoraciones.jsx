@@ -17,7 +17,7 @@ export default function Valoraciones() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Obtener valoraciones del negocio del usuario logueado
+  
   useEffect(() => {
     const cargarValoraciones = async () => {
       try {

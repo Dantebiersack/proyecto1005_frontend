@@ -1,4 +1,4 @@
-// src/components/pages/personalNearbiz/GestionMembresias.jsx
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import {
@@ -7,8 +7,7 @@ import {
   softDeleteMembresia,
   renewMembresia,
   createMembershipForBusiness,
-  // opcional:
-  // restoreMembresia,
+
 } from "../../../services/membershipsService";
 import "../personalNearbiz/GestionUsuarios.css";
 

@@ -1,4 +1,4 @@
-// src/components/pages/personalNearbiz/GestionCitas.jsx
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import {
@@ -17,7 +17,7 @@ import {
 import "../personalNearbiz/GestionUsuarios.css";
 
 const SLOT_MINUTES = 15;
-const PLAN_DAYS = 30; // no se usa aquí, pero mantenemos consistencia si lo quieres
+const PLAN_DAYS = 30; 
 
 function parseTimeOnly(tstr) {
   const [h, m] = (tstr || "00:00").split(":").map(Number);

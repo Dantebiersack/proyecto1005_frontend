@@ -1,4 +1,4 @@
-// src/components/layout/PrivateLayout.jsx
+
 import NavbarInicio from "../Navbar/NavbarInicio";
 import Sidebar from "./Sidebar";
 import { useState, useEffect } from "react";
@@ -10,7 +10,7 @@ export default function PrivateLayout() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
-  // 👇 esto evita que te regrese siempre
+
   const [hasRedirected, setHasRedirected] = useState(false);
 
   useEffect(() => {
@@ -19,15 +19,15 @@ export default function PrivateLayout() {
       return;
     }
 
-    // Si YA redirigimos, no lo volvemos a hacer
+    
     if (hasRedirected) return;
 
     const roles = user.roles || [];
 
-    // SOLO redirigir al entrar por primera vez
+   
     if (roles.includes("adminNearbiz") || roles.includes("personal")) {
       navigate("/solicitudes-empresas", { replace: true });
-      setHasRedirected(true); // ✔ evita loops
+      setHasRedirected(true); 
     }
 
   }, [user, navigate, hasRedirected]);

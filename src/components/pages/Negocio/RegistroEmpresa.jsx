@@ -1,4 +1,4 @@
-// Archivo RegistroEmpresa.jsx 
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../../services/api";
@@ -8,7 +8,7 @@ import { FaCalendarAlt, FaClock } from "react-icons/fa";
 import Swal from "sweetalert2";
 import "./RegistroEmpresa.css";
 
-// ⭐ Importar servicio de Membresías
+
 import { getMembresiasAdmin } from "../../../services/membershipsService";
 
 import logoImg from "../../../assets/nearBizLogo.jpg";
@@ -25,7 +25,7 @@ const HORARIO_INICIAL = DIAS_SEMANA.map((dia) => ({
   fin: "18:00",
 }));
 
-// ⭐⭐⭐ GEOLOCALIZACIÓN AUTOMÁTICA (OpenStreetMap)
+
 async function geocodeDireccion(direccion) {
   try {
     const resp = await fetch(
@@ -77,7 +77,7 @@ export default function RegistroEmpresa() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // 🔵 Cargar categorías
+ 
   useEffect(() => {
     const cargarCategorias = async () => {
       try {
@@ -92,7 +92,7 @@ export default function RegistroEmpresa() {
     cargarCategorias();
   }, []);
 
-  // 🔵 Cargar membresías desde backend
+ 
   useEffect(() => {
     const cargarMembresias = async () => {
       try {
@@ -107,12 +107,12 @@ export default function RegistroEmpresa() {
     cargarMembresias();
   }, []);
 
-  // ⭐⭐⭐ Manejo de inputs — AHORA incluye geocodificación automática para "direccion"
+
   const handleChange = async (e) => {
     const { name, value } = e.target;
     setFormData((p) => ({ ...p, [name]: value }));
 
-    // ⭐ Cuando el usuario escriba su dirección
+   
     if (name === "direccion" && value.length > 5) {
       const geo = await geocodeDireccion(value);
 
@@ -123,7 +123,7 @@ export default function RegistroEmpresa() {
           coordenadasLng: geo.lng,
         }));
 
-        // ⭐ SweetAlert bonito al detectar coordenadas
+        
         Swal.fire({
           title: "Ubicación detectada",
           text: "Las coordenadas fueron obtenidas automáticamente.",
@@ -330,7 +330,7 @@ export default function RegistroEmpresa() {
                   </div>
                 </div>
 
-                {/* ⭐ MEMBRESÍA */}
+               
                 <div className="form-group membresia-box">
                   <label>Membresía</label>
 

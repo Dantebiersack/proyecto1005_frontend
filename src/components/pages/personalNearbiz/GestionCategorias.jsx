@@ -1,4 +1,4 @@
-// src/components/pages/personalNearbiz/GestionCategorias.jsx
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import Swal from "sweetalert2";
 import {
@@ -32,7 +32,7 @@ export default function GestionCategorias() {
   async function refresh() {
     setLoading(true);
     try {
-      // para gestión queremos ver también las inactivas
+     
       const data = await listCategorias(true);
       setRaw(data || []);
     } finally {

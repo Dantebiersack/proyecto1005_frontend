@@ -1,4 +1,4 @@
-// src/components/pages/personalNearbiz/GestionUsuarios.jsx
+
 import { useEffect, useState } from "react";
 import {
   getUsuarios,
@@ -48,9 +48,9 @@ export default function GestionUsuarios() {
       setLoading(true);
       const data = await getUsuarios(true); // includeInactive = true
 
-      // 👇 AQUI normalizamos TODO lo que pueda venir en PascalCase
+ 
       const normalizados = data.map((u, idx) => ({
-        // si viene en camel lo usamos, si no, usamos Pascal, si no, fallback al idx
+    
         idUsuario: u.idUsuario ?? u.IdUsuario ?? idx,
         nombre: u.nombre ?? u.Nombre ?? "",
         email: u.email ?? u.Email ?? "",
@@ -67,9 +67,7 @@ export default function GestionUsuarios() {
     }
   }
 
-  // ============================
-  // ABRIR ALTA
-  // ============================
+
   function openNew() {
     setEditing(null);
     setFormData({
@@ -81,15 +79,13 @@ export default function GestionUsuarios() {
     setShowForm(true);
   }
 
-  // ============================
-  // ABRIR EDICIÓN
-  // ============================
+  
   function openEdit(u) {
     setEditing(u);
     setFormData({
       nombre: u.nombre,
       email: u.email,
-      contrasenaHash: "", // no se edita aquí
+      contrasenaHash: "", 
       idRol: u.idRol,
     });
     setShowForm(true);
@@ -107,7 +103,7 @@ export default function GestionUsuarios() {
           nombre: formData.nombre,
           email: formData.email,
           idRol: formData.idRol,
-          token: editing.token, // conservar
+          token: editing.token, 
         });
       } else {
         // create

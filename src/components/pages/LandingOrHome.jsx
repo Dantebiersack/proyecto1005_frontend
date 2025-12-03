@@ -1,4 +1,4 @@
-// src/components/pages/LandingOrHome.jsx
+
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import Inicio from "./Inicio.jsx";
