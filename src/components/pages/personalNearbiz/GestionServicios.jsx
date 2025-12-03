@@ -9,14 +9,14 @@ import {
   restoreServicio,
 } from "../../../services/serviciosService";
 import { listNegocios } from "../../../services/catalogosService";
-import "../personalNearbiz/GestionUsuarios.css";
+import "../personalNearbiz/GestionServicios.css";
 
 export default function GestionServicios({ isSuperAdmin = false }) {
   const [raw, setRaw] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // filtros
-  const [fEstado, setFEstado] = useState("activos"); // activos | inactivos | todos
+  const [fEstado, setFEstado] = useState("activos");
   const [fNegocio, setFNegocio] = useState("todos");
 
   // catálogos
@@ -24,13 +24,14 @@ export default function GestionServicios({ isSuperAdmin = false }) {
 
   const fetchedRef = useRef(false);
 
+ 
   const swalToast = (icon, title) =>
     Swal.fire({
       icon,
       title,
       timer: 1600,
       showConfirmButton: false,
-      position: "top-end",
+      position: "center", 
     });
 
   async function refresh() {
@@ -92,7 +93,7 @@ export default function GestionServicios({ isSuperAdmin = false }) {
       out = out.filter((r) => String(r.idNegocio) === String(fNegocio));
     }
 
-    // orden por nombre
+ 
     out = [...out].sort((a, b) =>
       String(a.nombreServicio).localeCompare(String(b.nombreServicio))
     );
@@ -103,7 +104,7 @@ export default function GestionServicios({ isSuperAdmin = false }) {
   // --------- acciones ---------
 
   async function abrirModalNuevo() {
-    // para super admin: elegir negocio
+   
     const optionsNegocio = negocios
       .map(function (n) {
         return '<option value="' + n.id + '">' + n.nombre + "</option>";
@@ -112,29 +113,30 @@ export default function GestionServicios({ isSuperAdmin = false }) {
 
     const { value, isConfirmed } = await Swal.fire({
       title: "Nuevo servicio",
+     
       html:
         (isSuperAdmin
           ? '<div class="swal2-field" style="text-align:left">' +
-            "<label>Negocio</label>" +
+            "<label style='color:#333; font-weight:600;'>Negocio</label>" +
             '<select id="sw-negocio" class="swal2-input" style="height:auto">' +
             optionsNegocio +
             "</select>" +
             "</div>"
           : "") +
         '<div class="swal2-field" style="text-align:left">' +
-        "<label>Nombre del servicio</label>" +
+        "<label style='color:#333; font-weight:600;'>Nombre del servicio</label>" +
         '<input id="sw-nombre" class="swal2-input" />' +
         "</div>" +
         '<div class="swal2-field" style="text-align:left">' +
-        "<label>Descripción</label>" +
+        "<label style='color:#333; font-weight:600;'>Descripción</label>" +
         '<textarea id="sw-desc" class="swal2-textarea"></textarea>' +
         "</div>" +
         '<div class="swal2-field" style="text-align:left">' +
-        "<label>Precio</label>" +
+        "<label style='color:#333; font-weight:600;'>Precio</label>" +
         '<input id="sw-precio" class="swal2-input" type="number" min="0" step="0.01" />' +
         "</div>" +
         '<div class="swal2-field" style="text-align:left">' +
-        "<label>Duración (minutos)</label>" +
+        "<label style='color:#333; font-weight:600;'>Duración (minutos)</label>" +
         '<input id="sw-dur" class="swal2-input" type="number" min="5" step="5" />' +
         "</div>",
       focusConfirm: false,
@@ -144,7 +146,7 @@ export default function GestionServicios({ isSuperAdmin = false }) {
       preConfirm: function () {
         var idNegocioSel = null;
 
-        // Sólo superadmin selecciona negocio manualmente
+      
         if (isSuperAdmin) {
           idNegocioSel = Number(document.getElementById("sw-negocio").value);
           if (!idNegocioSel) {
@@ -173,7 +175,7 @@ export default function GestionServicios({ isSuperAdmin = false }) {
           return false;
         }
 
-        // 👇 armamos el payload base
+     
         var payload = {
           nombreServicio: nombre,
           descripcion: desc || null,
@@ -181,7 +183,7 @@ export default function GestionServicios({ isSuperAdmin = false }) {
           duracionMinutos: durVal,
         };
 
-        // 👇 solo superadmin manda idNegocio
+        
         if (isSuperAdmin) {
           payload.idNegocio = idNegocioSel;
         }
@@ -215,21 +217,22 @@ export default function GestionServicios({ isSuperAdmin = false }) {
   async function abrirModalEditar(servicio) {
     const { value, isConfirmed } = await Swal.fire({
       title: "Editar servicio",
+   
       html:
         '<div class="swal2-field" style="text-align:left">' +
-        "<label>Nombre del servicio</label>" +
+        "<label style='color:#333; font-weight:600;'>Nombre del servicio</label>" +
         '<input id="sw-nombre" class="swal2-input" />' +
         "</div>" +
         '<div class="swal2-field" style="text-align:left">' +
-        "<label>Descripción</label>" +
+        "<label style='color:#333; font-weight:600;'>Descripción</label>" +
         '<textarea id="sw-desc" class="swal2-textarea"></textarea>' +
         "</div>" +
         '<div class="swal2-field" style="text-align:left">' +
-        "<label>Precio</label>" +
+        "<label style='color:#333; font-weight:600;'>Precio</label>" +
         '<input id="sw-precio" class="swal2-input" type="number" min="0" step="0.01" />' +
         "</div>" +
         '<div class="swal2-field" style="text-align:left">' +
-        "<label>Duración (minutos)</label>" +
+        "<label style='color:#333; font-weight:600;'>Duración (minutos)</label>" +
         '<input id="sw-dur" class="swal2-input" type="number" min="5" step="5" />' +
         "</div>",
       didOpen: function () {
@@ -297,7 +300,7 @@ export default function GestionServicios({ isSuperAdmin = false }) {
 
   async function cambiarEstado(servicio) {
     if (servicio.estado) {
-      // desactivar
+      
       const { isConfirmed } = await Swal.fire({
         title: "Desactivar servicio",
         text:
@@ -327,7 +330,7 @@ export default function GestionServicios({ isSuperAdmin = false }) {
         Swal.fire("Error", "No se pudo desactivar el servicio", "error");
       }
     } else {
-      // reactivar
+     
       const { isConfirmed } = await Swal.fire({
         title: "Reactivar servicio",
         text:
@@ -359,7 +362,7 @@ export default function GestionServicios({ isSuperAdmin = false }) {
     }
   }
 
-  // --------- render ---------
+
 
   return (
     <div className="gestion-usuarios-page">
@@ -430,6 +433,7 @@ export default function GestionServicios({ isSuperAdmin = false }) {
                   alignItems: "center",
                   justifyContent: "space-between",
                   gap: 10,
+                  color: "white", 
                 }}
               >
                 <div>

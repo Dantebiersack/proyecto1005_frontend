@@ -1,0 +1,577 @@
+.gestion-usuarios-page {
+  background: transparent; /* el fondo ya lo da el layout */
+  width: 100%;
+  padding: 0;
+  margin-top: 70px; /* lo da nb-content */
+}
+
+/* encabezado */
+.gestion-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.gestion-header h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #0a3d62;
+  margin-bottom: 4px;
+}
+
+.gestion-header p {
+  color: #3f4f66;
+  font-size: 0.9rem;
+}
+
+.gestion-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.nb-input {
+  border: 1px solid #d3d8df;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  outline: none;
+  min-width: 220px;
+  color: #333;
+  font-size: 0.9rem;
+}
+.nb-input:focus {
+  border-color: #2d63b4;
+  box-shadow: 0 0 0 2px rgba(45, 99, 180, 0.1);
+}
+
+.nb-btn-primary {
+  background: #3843c2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.nb-btn-primary:hover {
+  background: #2c35a3;
+}
+
+/* card / tabla */
+.gestion-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.gestion-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.gestion-table thead {
+  background: #f4f6fb;
+}
+
+.gestion-table th,
+.gestion-table td {
+  padding: 12px 18px;
+  font-size: 0.9rem;
+  color: #1e293b;
+  text-align: left;
+}
+
+.gestion-table tbody tr + tr {
+  border-top: 1px solid #edf0f6;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* badges */
+.badge-role {
+  background: #edf0ff;
+  color: #1c2b59;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.badge-info {
+  background: rgba(0, 123, 255, 0.14); /* Azul suave translúcido */
+  color: #0b5ed7; /* Azul medio */
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.badge-info-strong {
+  background: rgba(0, 123, 255, 0.18); /* Azul más marcado */
+  color: #084298; /* Azul oscuro */
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.badge-success {
+  background: rgba(0, 166, 90, 0.12);
+  color: #00a65a;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.badge-danger {
+  background: rgba(230, 57, 70, 0.12);
+  color: #e63946;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* acciones */
+.row-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.nb-btn-small {
+  background: #f1f2f6;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: 0.15s;
+}
+.nb-btn-small:hover {
+  background: #e2e5f0;
+}
+
+.nb-btn-small.danger {
+  background: rgba(230, 57, 70, 0.14);
+  color: #e63946;
+}
+.nb-btn-small.danger:hover {
+  background: rgba(230, 57, 70, 0.25);
+}
+
+.nb-btn-small.success {
+  background: rgba(0, 166, 90, 0.14);
+  color: #00a65a;
+}
+.nb-btn-small.success:hover {
+  background: rgba(0, 166, 90, 0.25);
+}
+
+/* modal */
+/* =========================================
+   ===== MODAL SOLUCIÓN FINAL (SCROLL) =====
+   ========================================= */
+
+.nb-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Centra el modal verticalmente */
+  z-index: 2000;
+  padding: 20px; /* Espacio para que no toque los bordes en móviles */
+  box-sizing: border-box;
+}
+
+.nb-modal {
+  background: #ffffff;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+
+  /* 👇 LA CLAVE: Altura máxima fija relativa a la ventana */
+  max-height: 85vh;
+
+  /* Estructura Flex Vertical */
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  position: relative;
+  /* Quitamos el padding general para manejarlo por secciones */
+  padding: 0;
+  overflow: hidden; /* Importante para bordes redondeados */
+}
+
+/* --- 1. CABECERA (FIJA) --- */
+.nb-modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+
+  /* Evita que se aplaste */
+  flex-shrink: 0;
+}
+
+.nb-modal-header h2 {
+  font-size: 1.3rem;
+  color: #0a3d62;
+  font-weight: 700;
+  margin: 0;
+}
+
+.nb-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: #999;
+  cursor: pointer;
+  line-height: 1;
+  padding: 5px;
+}
+
+/* --- 2. CUERPO (SCROLLEABLE) --- */
+.nb-modal-body {
+  padding: 24px;
+
+  /* 👇 ESTO ACTIVA EL SCROLL */
+  overflow-y: auto;
+
+  /* 👇 TRUCO DE FLEXBOX: Ocupa el espacio, pero permite encogerse */
+  flex: 1 1 auto;
+  min-height: 0; /* Crucial para Firefox/Chrome */
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nb-modal-body label {
+  display: block;
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* Inputs corregidos (Texto oscuro sobre fondo blanco) */
+.nb-modal-body input,
+.nb-modal-body select,
+.nb-modal-body textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  background-color: #fff !important;
+  color: #333 !important; /* Texto visible */
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.nb-modal-body input:focus,
+.nb-modal-body select:focus,
+.nb-modal-body textarea:focus {
+  border-color: #3843c2;
+  box-shadow: 0 0 0 3px rgba(56, 67, 194, 0.1);
+}
+
+.nb-modal-body input[disabled] {
+  background-color: #f5f5f5 !important;
+  color: #777 !important;
+  cursor: not-allowed;
+}
+
+/* --- 3. PIE (FIJO) --- */
+.nb-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #eee;
+  background: #f9f9f9;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+
+  /* Evita que se aplaste */
+  flex-shrink: 0;
+}
+
+.nb-btn-secondary {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  color: #555;
+  font-weight: 600;
+}
+
+.nb-btn-secondary:hover {
+  background: #f0f0f0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 760px) {
+  .nb-modal {
+    max-height: 95vh; /* Casi toda la pantalla en móvil */
+    max-width: 95%;
+  }
+}
+
+/* --- badges nuevas (riesgo/tiempo) --- */
+.badge-warning {
+  background: rgba(255, 193, 7, 0.14);
+  color: #b8860b;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.badge-warning-strong {
+  background: rgba(255, 159, 67, 0.18);
+  color: #c05621;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* --- resaltado por fila según cercanía --- */
+.row-soon-7 {
+  background: linear-gradient(to right, rgba(255, 193, 7, 0.06), transparent);
+}
+.row-soon-3 {
+  background: linear-gradient(to right, rgba(255, 159, 67, 0.08), transparent);
+}
+.row-expired {
+  background: linear-gradient(to right, rgba(230, 57, 70, 0.08), transparent);
+}
+
+/* leyenda */
+.legend-chip {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 4px 10px;
+  border: 1px solid #e6e9f2;
+  background: #fff;
+  color: #1e293b;
+}
+.legend-chip.soon7 {
+  box-shadow: inset 0 0 0 999px rgba(255, 193, 7, 0.08);
+}
+.legend-chip.soon3 {
+  box-shadow: inset 0 0 0 999px rgba(255, 159, 67, 0.1);
+}
+.legend-chip.expired {
+  box-shadow: inset 0 0 0 999px rgba(230, 57, 70, 0.1);
+}
+
+.gestion-usuarios-page {
+  padding: 20px;
+}
+.gestion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+.gestion-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.nb-input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  color: #333;       /* Texto gris oscuro/negro */
+}
+
+.nb-btn-primary {
+  background: #03a65a;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.nb-btn-primary:hover {
+  background: #02894e;
+}
+.nb-btn-secondary {
+  background: #ccc;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.nb-btn-small {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  margin-right: 4px;
+}
+.nb-btn-small.success {
+  background: #00a65a;
+  color: #fff;
+}
+.nb-btn-small.danger {
+  background: #dd4b39;
+  color: #fff;
+}
+.text-center {
+  text-align: center;
+}
+
+/* Card y tabla */
+.gestion-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+}
+.gestion-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.gestion-table th,
+.gestion-table td {
+  padding: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+.gestion-table th {
+  background: #f7f7f7;
+  cursor: pointer;
+}
+
+/* Badges y resaltados */
+.badge-success {
+  background: rgba(0, 166, 90, 0.12);
+  color: #0f6d4c;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+.badge-warning {
+  background: rgba(255, 193, 7, 0.14);
+  color: #b8860b;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+.badge-warning-strong {
+  background: rgba(255, 159, 67, 0.18);
+  color: #c05621;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+.badge-danger {
+  background: rgba(221, 75, 57, 0.16);
+  color: #b33428;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+.row-soon-7 {
+  background: linear-gradient(to right, rgba(255, 193, 7, 0.06), transparent);
+}
+.row-soon-3 {
+  background: linear-gradient(to right, rgba(255, 159, 67, 0.08), transparent);
+}
+.row-expired {
+  background: linear-gradient(to right, rgba(230, 57, 70, 0.08), transparent);
+}
+
+/* Modal */
+.nb-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.nb-modal {
+  background: white;
+  border-radius: 8px;
+  width: 420px;
+  max-width: 95vw;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+.nb-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+}
+.nb-modal-close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  cursor: pointer;
+}
+.nb-modal-body {
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+.nb-modal-body label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.9rem;
+}
+.nb-modal-body input {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+.nb-modal-footer {
+  padding: 12px 16px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+/* FORZAR COLOR OSCURO EN ETIQUETAS DE SWEETALERT */
+.swal2-container .swal2-field label {
+  color: #333333 !important; /* Gris oscuro / Negro */
+  font-weight: 600;
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Opcional: Asegurar que los inputs también tengan texto oscuro */
+.swal2-container .swal2-input,
+.swal2-container .swal2-textarea {
+  color: #333333 !important;
+}
