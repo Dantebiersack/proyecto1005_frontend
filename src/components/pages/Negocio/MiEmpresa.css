@@ -1,4 +1,4 @@
-.miempresa-container { max-width:900px; margin:50px auto; padding:30px; background:#f9faff; border-radius:25px; box-shadow:0 10px 35px rgba(0,0,0,0.15); font-family:"Poppins",sans-serif; color:#1b1b1b; }
+.miempresa-container { max-width:900px; margin:50px auto; padding:30px; background:#0a3d62; border-radius:25px; box-shadow:0 10px 35px rgba(0,0,0,0.15); font-family:"Poppins",sans-serif; color:#1b1b1b; }
 .miempresa-container h1 { text-align:center; color:#0a3d62; font-size:2.5rem; margin-bottom:30px; font-weight:800; }
 
 .datos-empresa.tarjeta { background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,0.1); transition:transform 0.3s; }
@@ -7,7 +7,7 @@
 .info-abajo { padding:25px; text-align:left; }
 .info-abajo p { margin:6px 0; }
 
-button.editar { background:#0a3d62; color:#fff; border:none; padding:12px 25px; border-radius:12px; cursor:pointer; font-weight:700; margin-top:20px; transition:0.3s; }
+button.editar { background:#1b8bdb; color:#fff; border:none; padding:12px 25px; border-radius:12px; cursor:pointer; font-weight:700; margin-top:20px; transition:0.3s; }
 button.editar:hover { background:#2d63b4; }
 
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:999; }

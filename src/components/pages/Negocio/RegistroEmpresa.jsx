@@ -25,6 +25,28 @@ const HORARIO_INICIAL = DIAS_SEMANA.map((dia) => ({
   fin: "18:00",
 }));
 
+// ⭐⭐⭐ GEOLOCALIZACIÓN AUTOMÁTICA (OpenStreetMap)
+async function geocodeDireccion(direccion) {
+  try {
+    const resp = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        direccion
+      )}`
+    );
+
+    const data = await resp.json();
+    if (data.length === 0) return null;
+
+    return {
+      lat: data[0].lat,
+      lng: data[0].lon,
+    };
+  } catch (e) {
+    console.error("Error geocodificando:", e);
+    return null;
+  }
+}
+
 export default function RegistroEmpresa() {
   const navigate = useNavigate();
 
@@ -85,10 +107,32 @@ export default function RegistroEmpresa() {
     cargarMembresias();
   }, []);
 
-  // Manejo de inputs
-  const handleChange = (e) => {
+  // ⭐⭐⭐ Manejo de inputs — AHORA incluye geocodificación automática para "direccion"
+  const handleChange = async (e) => {
     const { name, value } = e.target;
     setFormData((p) => ({ ...p, [name]: value }));
+
+    // ⭐ Cuando el usuario escriba su dirección
+    if (name === "direccion" && value.length > 5) {
+      const geo = await geocodeDireccion(value);
+
+      if (geo) {
+        setFormData((prev) => ({
+          ...prev,
+          coordenadasLat: geo.lat,
+          coordenadasLng: geo.lng,
+        }));
+
+        // ⭐ SweetAlert bonito al detectar coordenadas
+        Swal.fire({
+          title: "Ubicación detectada",
+          text: "Las coordenadas fueron obtenidas automáticamente.",
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false,
+        });
+      }
+    }
   };
 
   const handleHorarioChange = (index, field, value) => {
@@ -192,6 +236,7 @@ export default function RegistroEmpresa() {
             <p>Ingresa tus datos para comenzar a administrar tus citas.</p>
 
             <form onSubmit={handleSubmit} className="register-form">
+
               {/* ADMIN */}
               <fieldset>
                 <legend>1. Datos del Administrador</legend>
@@ -218,6 +263,7 @@ export default function RegistroEmpresa() {
                       required
                     />
                   </div>
+
                   <div className="form-group">
                     <label>Contraseña</label>
                     <input
@@ -238,12 +284,15 @@ export default function RegistroEmpresa() {
                 <div className="form-group">
                   <label>Nombre del Negocio</label>
                   <input
-                    type="text"
-                    name="nombreNegocio"
-                    value={formData.nombreNegocio}
-                    onChange={handleChange}
-                    required
-                  />
+  type="text"
+  name="nombreNegocio"
+  value={formData.nombreNegocio}
+  onChange={(e) =>
+    setFormData((p) => ({ ...p, nombreNegocio: e.target.value.toUpperCase() }))
+  }
+  required
+/>
+
                 </div>
 
                 <div className="form-grid-2">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./MiEmpresa.css";
 import { getMiNegocio, getCategorias, updateNegocio } from "../../../services/miempresaService";
+import Swal from "sweetalert2"; // ⭐ AÑADIDO
 
 const DIAS_SEMANA = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
 
@@ -47,12 +48,38 @@ export default function MiEmpresa() {
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setError(""); setSuccess("");
+    setError(""); 
+    setSuccess("");
+
     try {
       const data = { ...formData, HorarioAtencion: JSON.stringify(horario) };
       await updateNegocio(formData.IdNegocio || "MiNegocio", data);
-      setSuccess("Datos actualizados correctamente."); setEditMode(false);
-    } catch (err) { console.error(err); setError("No se pudieron actualizar los datos."); }
+
+      // ⭐ SWEETALERT2 DE ÉXITO
+      Swal.fire({
+        title: "¡Datos actualizados!",
+        text: "Tu información se guardó correctamente.",
+        icon: "success",
+        confirmButtonColor: "#0a6fd8",
+      });
+
+      setSuccess("Datos actualizados correctamente.");
+      setEditMode(false);
+
+    } catch (err) {
+
+      console.error(err);
+
+      // ⭐ SWEETALERT2 DE ERROR
+      Swal.fire({
+        title: "Error",
+        text: "No se pudieron actualizar los datos.",
+        icon: "error",
+        confirmButtonColor: "#d9534f",
+      });
+
+      setError("No se pudieron actualizar los datos.");
+    }
   };
 
   if (loading) return <p>Cargando...</p>;
@@ -60,9 +87,12 @@ export default function MiEmpresa() {
   return (
     <div className="miempresa-container">
       <h1>Mi Empresa</h1>
+
       {formData.Nombre ? (
         <div className="datos-empresa tarjeta">
-          <div className="foto-arriba">{formData.LinkUrl ? <img src={formData.LinkUrl} alt="Negocio"/> : <div className="foto-placeholder">Sin Imagen</div>}</div>
+          <div className="foto-arriba">
+            {formData.LinkUrl ? <img src={formData.LinkUrl} alt="Negocio"/> : <div className="foto-placeholder">Sin Imagen</div>}
+          </div>
           <div className="info-abajo">
             <p><strong>Nombre:</strong> {formData.Nombre}</p>
             <p><strong>Dirección:</strong> {formData.Direccion}</p>
@@ -74,7 +104,7 @@ export default function MiEmpresa() {
         </div>
       ) : <p>No tienes un negocio registrado aún.</p>}
 
-      <button className="editar" onClick={() => setEditMode(true)}>Editar</button>
+      <button className="editar" onClick={() => setEditMode(true)}>Comenzar a editar mi empresa</button>
 
       {/* MODAL EDITAR */}
       {editMode && (
@@ -82,31 +112,54 @@ export default function MiEmpresa() {
           <div className="modal modal-ancho">
             <form onSubmit={handleSubmit} className="modal-form">
               <h2>Editar Datos de Mi Empresa</h2>
+
               <div className="modal-body-modalarriba">
                 <div className="foto-arriba-modal">
                   {formData.LinkUrl ? <img src={formData.LinkUrl} alt="Negocio"/> : <div className="foto-placeholder">Sin Imagen</div>}
-                  <input type="file" accept="image/*" onChange={e=>{
-                    const file=e.target.files[0]; if(file){const reader=new FileReader(); reader.onload=()=>setFormData(prev=>({...prev,LinkUrl:reader.result})); reader.readAsDataURL(file);}
-                  }}/>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e=>{
+                      const file=e.target.files[0];
+                      if(file){
+                        const reader=new FileReader();
+                        reader.onload=()=>setFormData(prev=>({...prev,LinkUrl:reader.result}));
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
                 </div>
+
                 <div className="form-col-modal">
                   <label>Nombre:</label><input name="Nombre" value={formData.Nombre} onChange={handleChange}/>
                   <label>Dirección:</label><input name="Direccion" value={formData.Direccion} onChange={handleChange}/>
                   <label>Teléfono:</label><input name="TelefonoContacto" value={formData.TelefonoContacto} onChange={handleChange}/>
                   <label>Correo:</label><input name="CorreoContacto" value={formData.CorreoContacto} onChange={handleChange}/>
+                  
                   <label>Categoría:</label>
                   <select name="IdCategoria" value={formData.IdCategoria} onChange={handleChange}>
                     <option value="">Seleccione</option>
-                    {categorias.map(c=><option key={c.IdCategoria} value={c.IdCategoria}>{c.NombreCategoria}</option>)}
+                    {categorias.map(c => (
+                      <option key={c.IdCategoria} value={c.IdCategoria}>
+                        {c.NombreCategoria}
+                      </option>
+                    ))}
                   </select>
-                  <label>Descripción:</label><textarea name="Descripcion" value={formData.Descripcion} onChange={handleChange}/>
-                  <button type="button" className="btn-config-horario" onClick={()=>setShowScheduleModal(true)}>Editar Horarios</button>
+
+                  <label>Descripción:</label>
+                  <textarea name="Descripcion" value={formData.Descripcion} onChange={handleChange}/>
+                  
+                  <button type="button" className="btn-config-horario" onClick={()=>setShowScheduleModal(true)}>
+                    Editar Horarios
+                  </button>
                 </div>
               </div>
+
               <div className="botones">
                 <button className="guardar" type="submit">Guardar</button>
                 <button className="cancelar" type="button" onClick={()=>setEditMode(false)}>Cancelar</button>
               </div>
+
               {success && <p className="success">{success}</p>}
               {error && <p className="error">{error}</p>}
             </form>
@@ -122,19 +175,38 @@ export default function MiEmpresa() {
               <h3>Configurar Horario</h3>
               <button className="btn-close-modal" onClick={()=>setShowScheduleModal(false)}>×</button>
             </div>
+
             {horario.map((dia,i)=>(
               <div key={dia.dia} className="horario-row">
                 <div className="horario-check">
-                  <input type="checkbox" checked={dia.activo} onChange={e=>handleHorarioChange(i,"activo",e.target.checked)}/>
+                  <input
+                    type="checkbox"
+                    checked={dia.activo}
+                    onChange={e=>handleHorarioChange(i,"activo",e.target.checked)}
+                  />
                   <span>{dia.dia}</span>
                 </div>
+
                 <div className="horario-horas">
-                  <input type="time" value={dia.inicio} disabled={!dia.activo} onChange={e=>handleHorarioChange(i,"inicio",e.target.value)}/>
-                  <input type="time" value={dia.fin} disabled={!dia.activo} onChange={e=>handleHorarioChange(i,"fin",e.target.value)}/>
+                  <input
+                    type="time"
+                    value={dia.inicio}
+                    disabled={!dia.activo}
+                    onChange={e=>handleHorarioChange(i,"inicio",e.target.value)}
+                  />
+                  <input
+                    type="time"
+                    value={dia.fin}
+                    disabled={!dia.activo}
+                    onChange={e=>handleHorarioChange(i,"fin",e.target.value)}
+                  />
                 </div>
               </div>
             ))}
-            <button className="btn-save-horario" onClick={()=>setShowScheduleModal(false)}>Guardar Horarios</button>
+
+            <button className="btn-save-horario" onClick={()=>setShowScheduleModal(false)}>
+              Guardar Horarios
+            </button>
           </div>
         </div>
       )}

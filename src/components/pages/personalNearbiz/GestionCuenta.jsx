@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { actualizarPerfil } from "../../../services/gestionCuentaService";
-import "./GestionCuenta.css"; // ← OBLIGATORIO IMPORTAR
+import Swal from "sweetalert2";  // ⭐ AÑADIDO
+import "./GestionCuenta.css";
 
 export default function GestionCuenta() {
   const [user, setUser] = useState(null);
@@ -19,9 +20,25 @@ export default function GestionCuenta() {
   const guardar = async () => {
     try {
       await actualizarPerfil(user.id, nombre, password);
-      alert("Perfil actualizado correctamente ✔");
+
+      // ⭐ ALERTA DE ÉXITO
+      Swal.fire({
+        title: "Perfil actualizado",
+        text: "Tus datos han sido actualizados correctamente.",
+        icon: "success",
+        confirmButtonColor: "#0a6fd8",
+      });
+
     } catch (e) {
-      alert("No se pudo actualizar ❌");
+
+      // ⭐ ALERTA DE ERROR
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo actualizar el perfil.",
+        icon: "error",
+        confirmButtonColor: "#d9534f",
+      });
+
     }
   };
 
@@ -32,10 +49,18 @@ export default function GestionCuenta() {
       <h2>⚙ Gestión de Cuenta</h2>
 
       <label>Nombre de usuario</label>
-      <input value={nombre} onChange={(e) => setNombre(e.target.value)} />
+      <input
+        value={nombre}
+        onChange={(e) => setNombre(e.target.value)}
+      />
 
-      <label>Nueva contraseña <span>(opcional)</span></label>
-      <input type="password" onChange={(e) => setPassword(e.target.value)} />
+      <label>
+        Nueva contraseña <span>(opcional)</span>
+      </label>
+      <input
+        type="password"
+        onChange={(e) => setPassword(e.target.value)}
+      />
 
       <button onClick={guardar}>Guardar Cambios</button>
     </div>
