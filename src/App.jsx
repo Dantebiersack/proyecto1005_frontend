@@ -22,8 +22,9 @@ import GestionUsuarios from "./components/pages/personalNearbiz/GestionUsuarios.
 import GestionMembresias from "./components/pages/personalNearbiz/GestionMembresias.jsx";
 import GestionCitas from "./components/pages/personalNearbiz/GestionCitas.jsx";
 import ServiciosNegocio from "./components/pages/personalNearbiz/GestionServicios.jsx";
+import NotFound from "./components/pages/NotFound.jsx"; 
 
-// ⭐ Footer agregado
+
 import Footer from "./Footer.jsx";
 
 export default function App() {
@@ -31,6 +32,7 @@ export default function App() {
     <>
       <Routes>
         <Route path="/" element={<LandingOrHome />} />
+        <Route path="*" element={<NotFound />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registro-empresa" element={<RegistroEmpresa />} />
 
@@ -56,7 +58,7 @@ export default function App() {
             }
           />
 
-          {/* 👍 Esta ruta venía SOLO en el código de tu compañero */}
+       
           <Route
             path="/categorias"
             element={
@@ -162,9 +164,10 @@ export default function App() {
           />
 
         </Route>
+       
       </Routes>
-
-      {/* Footer */}
+ 
+     
       <Footer />
     </>
   );

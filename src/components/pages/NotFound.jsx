@@ -1,9 +1,28 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import NavbarInicio from "../Navbar/NavbarInicio"; 
+import "./NotFound.css"; 
+
 export default function NotFound() {
+  const navigate = useNavigate();
+
   return (
-    <section style={{padding: 24}}>
-      <h1>404 – Página no encontrada</h1>
-      <p>Revisa la URL o vuelve al inicio.</p>
-      <a href="/">Ir al inicio</a>
-    </section>
-  )
+    <div className="not-found-container">
+      
+      <NavbarInicio />
+
+      <div className="not-found-content">
+        <h1 className="error-code">404</h1>
+        <h2 className="error-title">¡Ups! Página no encontrada</h2>
+        <p className="error-text">
+          Lo sentimos, no pudimos encontrar la página que estás buscando. 
+          Pudo haber sido eliminada, cambiada de nombre o no está disponible temporalmente.
+        </p>
+        
+        <button className="btn-home" onClick={() => navigate("/")}>
+          Volver al Inicio
+        </button>
+      </div>
+    </div>
+  );
 }
