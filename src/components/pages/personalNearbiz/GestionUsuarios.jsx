@@ -18,8 +18,8 @@ const ROLES_MAP = {
 
 const ROLES_OPTIONS = [
   { id: 1, label: "Admin NearBiz" },
-  { id: 2, label: "Personal" },
-  { id: 3, label: "Admin de negocio" },
+  { id: 2, label: "Admin de negocio" },
+  { id: 3, label: "Personal" },
 ];
 
 export default function GestionUsuarios() {
