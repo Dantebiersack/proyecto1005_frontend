@@ -10,8 +10,10 @@
 .split-screen-container {
   display: flex;
   width: 100%;
+  margin-top: 0 !important; /* El !important asegura que sobrescriba cualquier otra regla */
+    padding-top: 0;
   
-  /* 👇 ARREGLO PARA NAVBAR FIJO 👇 */
+
   /* 1. Empujamos el contenido hacia abajo (ajusta 70px si tu navbar es más alto) */
   margin-top: 70px; 
   
