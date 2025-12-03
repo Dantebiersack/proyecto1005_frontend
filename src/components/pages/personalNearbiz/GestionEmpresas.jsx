@@ -304,10 +304,10 @@ export default function GestionEmpresas() {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar empresa..."
           />
-          <button className="nb-btn-primary" onClick={openNew}>
+          {/* <button className="nb-btn-primary" onClick={openNew}>
             <FaPlus size={12} style={{ marginRight: "6px" }} />
             Nueva Empresa
-          </button>
+          </button> */}
         </div>
       </div>
 
