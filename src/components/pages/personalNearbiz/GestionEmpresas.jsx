@@ -11,9 +11,9 @@ import { useAuth } from "../../../auth/AuthContext";
 import { uploadImage } from "../../../services/storageService"; 
 import "./GestionUsuarios.css"; 
 import { FaPlus } from "react-icons/fa";
-import Swal from "sweetalert2"; // 👈 Importamos SweetAlert
+import Swal from "sweetalert2"; 
 
-// Estado inicial del formulario
+
 const FORM_INICIAL = {
   nombre: "",
   idCategoria: "",
@@ -32,17 +32,20 @@ export default function GestionEmpresas() {
   const [negocios, setNegocios] = useState([]);
   const [categorias, setCategorias] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
   
+  
+  const [search, setSearch] = useState("");
+  const [filterCategoria, setFilterCategoria] = useState(""); 
+  const [filterEstado, setFilterEstado] = useState("all");
+  
+ 
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [formData, setFormData] = useState(FORM_INICIAL);
   
   const [uploading, setUploading] = useState(false);
 
-  // ============================
-  // CARGA INICIAL
-  // ============================
+ 
   useEffect(() => {
     cargarDatos();
   }, []);
@@ -69,9 +72,7 @@ export default function GestionEmpresas() {
     return cat ? cat.NombreCategoria : "Sin categoría";
   };
 
-  // ============================
-  // MANEJADORES
-  // ============================
+  
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -87,9 +88,7 @@ export default function GestionEmpresas() {
     }
   };
 
-  // ============================
-  // MODALES
-  // ============================
+  
   function openNew() {
     setEditing(null);
     setFormData(FORM_INICIAL);
@@ -99,9 +98,14 @@ export default function GestionEmpresas() {
   function openEdit(negocio) {
     setEditing(negocio);
     
-    let horarioSafe = negocio.HorarioAtencion;
-    if (typeof horarioSafe === 'object' && horarioSafe !== null) {
-        horarioSafe = JSON.stringify(horarioSafe);
+    
+    let horarioValue = "";
+    if (negocio.HorarioAtencion) {
+        if (typeof negocio.HorarioAtencion === 'object') {
+            horarioValue = JSON.stringify(negocio.HorarioAtencion);
+        } else {
+            horarioValue = negocio.HorarioAtencion;
+        }
     }
 
     setFormData({
@@ -111,6 +115,7 @@ export default function GestionEmpresas() {
       telefonoContacto: negocio.TelefonoContacto || "",
       correoContacto: negocio.CorreoContacto || "",
       descripcion: negocio.Descripcion || "",
+      horarioAtencion: horarioValue, 
       linkUrl: negocio.LinkUrl || "",
       coordenadasLat: negocio.CoordenadasLat || 21.1165,
       coordenadasLng: negocio.CoordenadasLng || -101.6696,
@@ -118,24 +123,58 @@ export default function GestionEmpresas() {
     setShowForm(true);
   }
 
-  // ============================
-  // GUARDAR
-  // ============================
   async function handleSubmit(e) {
     e.preventDefault();
-
-    // Validaciones básicas
-    if (!formData.nombre || !formData.idCategoria) {
-      return Swal.fire("Campos vacíos", "Por favor completa el nombre y la categoría.", "warning");
-    }
     
+    
+    if (!formData.nombre.trim() || !formData.idCategoria) {
+        return Swal.fire("Campos vacíos", "Por favor completa el nombre y la categoría.", "warning");
+    }
+
+  
+    const nombreUpper = formData.nombre.toUpperCase().trim();
+
+   
+    const nombreRegex = /^[A-Z0-9ÑÁÉÍÓÚÜ\s.,&\-]+$/;
+    if (!nombreRegex.test(nombreUpper)) {
+        return Swal.fire("Caracteres inválidos", "El nombre contiene caracteres especiales no permitidos.", "warning");
+    }
+
+    
+    if (formData.telefonoContacto) {
+        const phoneRegex = /^[0-9+\-\s]+$/;
+        if (!phoneRegex.test(formData.telefonoContacto)) {
+            return Swal.fire("Teléfono inválido", "El teléfono solo debe contener números.", "warning");
+        }
+        if (formData.telefonoContacto.length < 7 || formData.telefonoContacto.length > 15) {
+            return Swal.fire("Teléfono inválido", "La longitud del teléfono parece incorrecta (7-15 dígitos).", "warning");
+        }
+    }
+
+    
+    if (formData.correoContacto) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.correoContacto)) {
+            return Swal.fire("Email inválido", "Por favor verifica el formato del correo público.", "warning");
+        }
+    }
+
+    
+    if (formData.coordenadasLat && (isNaN(formData.coordenadasLat) || formData.coordenadasLat < -90 || formData.coordenadasLat > 90)) {
+        return Swal.fire("Ubicación inválida", "La latitud debe estar entre -90 y 90.", "warning");
+    }
+    if (formData.coordenadasLng && (isNaN(formData.coordenadasLng) || formData.coordenadasLng < -180 || formData.coordenadasLng > 180)) {
+        return Swal.fire("Ubicación inválida", "La longitud debe estar entre -180 y 180.", "warning");
+    }
+
+   
     let horarioFinal = null;
     if (editing) {
         horarioFinal = editing.HorarioAtencion;
     }
 
     const dto = {
-      Nombre: formData.nombre,
+      Nombre: nombreUpper, 
       IdCategoria: parseInt(formData.idCategoria),
       Direccion: formData.direccion,
       TelefonoContacto: formData.telefonoContacto,
@@ -143,8 +182,8 @@ export default function GestionEmpresas() {
       Descripcion: formData.descripcion,
       HorarioAtencion: horarioFinal, 
       LinkUrl: formData.linkUrl,
-      CoordenadasLat: parseFloat(formData.coordenadasLat),
-      CoordenadasLng: parseFloat(formData.coordenadasLng),
+      CoordenadasLat: formData.coordenadasLat ? parseFloat(formData.coordenadasLat) : null,
+      CoordenadasLng: formData.coordenadasLng ? parseFloat(formData.coordenadasLng) : null,
       IdMembresia: null,
     };
 
@@ -165,12 +204,12 @@ export default function GestionEmpresas() {
   }
 
   // ============================
-  // ACCIONES (Con SweetAlert)
+  // ACCIONES
   // ============================
   async function handleDelete(negocio) {
     const result = await Swal.fire({
       title: `¿Desactivar "${negocio.Nombre}"?`,
-      text: "La empresa dejará de aparecer en la aplicación.",
+      text: "La empresa dejará de ser visible.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -185,7 +224,7 @@ export default function GestionEmpresas() {
         await cargarDatos();
         Swal.fire("Desactivado", "La empresa ha sido desactivada.", "success");
       } catch (err) {
-        Swal.fire("Error", "No se pudo desactivar la empresa.", "error");
+        Swal.fire("Error", "No se pudo desactivar.", "error");
       }
     }
   }
@@ -193,11 +232,8 @@ export default function GestionEmpresas() {
   async function handleRestore(negocio) {
     const result = await Swal.fire({
       title: `¿Reactivar "${negocio.Nombre}"?`,
-      text: "La empresa volverá a estar visible.",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: "#2e7d32",
-      cancelButtonColor: "#3085d6",
       confirmButtonText: "Sí, activar",
       cancelButtonText: "Cancelar"
     });
@@ -208,21 +244,24 @@ export default function GestionEmpresas() {
         await cargarDatos();
         Swal.fire("Activado", "La empresa está activa nuevamente.", "success");
       } catch (err) {
-        Swal.fire("Error", "No se pudo activar la empresa.", "error");
+        Swal.fire("Error", "No se pudo activar.", "error");
       }
     }
   }
 
-  // ============================
-  // RENDER
-  // ============================
+  
   const filtered = negocios.filter((n) => {
-    if (!search.trim()) return true;
-    const q = search.toLowerCase();
-    return (
-      (n.Nombre || "").toLowerCase().includes(q) ||
-      (n.CorreoContacto || "").toLowerCase().includes(q)
+    const matchSearch = !search.trim() || (
+      (n.Nombre || "").toLowerCase().includes(search.toLowerCase()) ||
+      (n.CorreoContacto || "").toLowerCase().includes(search.toLowerCase())
     );
+    const matchCategoria = !filterCategoria || n.IdCategoria === Number(filterCategoria);
+    
+    let matchEstado = true;
+    if (filterEstado === "active") matchEstado = n.Estado === true;
+    if (filterEstado === "inactive") matchEstado = n.Estado === false;
+
+    return matchSearch && matchCategoria && matchEstado;
   });
 
   return (
@@ -233,16 +272,42 @@ export default function GestionEmpresas() {
           <p>Administra los negocios registrados en la plataforma.</p>
         </div>
         <div className="gestion-actions">
+          
+          <select 
+            className="nb-input"
+            value={filterEstado}
+            onChange={(e) => setFilterEstado(e.target.value)}
+            style={{ minWidth: "120px", cursor: "pointer" }}
+          >
+            <option value="all">Todos</option>
+            <option value="active">Activos</option>
+            <option value="inactive">Inactivos</option>
+          </select>
+
+          <select 
+            className="nb-input"
+            value={filterCategoria}
+            onChange={(e) => setFilterCategoria(e.target.value)}
+            style={{ minWidth: "180px", cursor: "pointer" }}
+          >
+            <option value="">Todas las categorías</option>
+            {categorias.map((cat) => (
+              <option key={cat.IdCategoria} value={cat.IdCategoria}>
+                {cat.NombreCategoria}
+              </option>
+            ))}
+          </select>
+
           <input
             className="nb-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar empresa..."
           />
-          {/* <button className="nb-btn-primary" onClick={openNew}>
+          <button className="nb-btn-primary" onClick={openNew}>
             <FaPlus size={12} style={{ marginRight: "6px" }} />
             Nueva Empresa
-          </button> */}
+          </button>
         </div>
       </div>
 
@@ -251,6 +316,7 @@ export default function GestionEmpresas() {
           <thead>
             <tr>
               <th>Nombre</th>
+              <th>Administrador</th>
               <th>Categoría</th>
               <th>Contacto</th>
               <th>Estado</th>
@@ -259,54 +325,40 @@ export default function GestionEmpresas() {
           </thead>
           <tbody>
             {loading ? (
-              <tr key="loading">
-                <td colSpan="5" className="text-center">Cargando...</td>
-              </tr>
+              <tr key="loading"><td colSpan="6" className="text-center">Cargando...</td></tr>
             ) : filtered.length ? (
               filtered.map((n) => (
                 <tr key={n.IdNegocio}>
                   <td>
-                    <div style={{ fontWeight: "bold" }}>{n.Nombre}</div>
+                    <div style={{ fontWeight: "bold", color: "#0a3d62" }}>{n.Nombre}</div>
                     <small style={{ color: "#666" }}>{n.Direccion}</small>
                   </td>
                   <td>
-                    <span className="badge-role">
-                      {getNombreCategoria(n.IdCategoria)}
-                    </span>
+                    <div style={{ fontWeight: "600" }}>{n.AdminNombre}</div>
+                    <small style={{ color: "#555", fontSize: "0.8rem" }}>{n.AdminEmail}</small>
                   </td>
+                  <td><span className="badge-role">{getNombreCategoria(n.IdCategoria)}</span></td>
                   <td>
                     <div style={{ fontSize: "0.85rem" }}>{n.TelefonoContacto}</div>
                     <div style={{ fontSize: "0.85rem", color: "#555" }}>{n.CorreoContacto}</div>
                   </td>
                   <td>
-                    {n.Estado ? (
-                      <span className="badge-success">Activo</span>
-                    ) : (
-                      <span className="badge-danger">Inactivo</span>
-                    )}
+                    {n.Estado ? <span className="badge-success">Activo</span> : <span className="badge-danger">Inactivo</span>}
                   </td>
                   <td>
                     <div className="row-actions">
-                      <button className="nb-btn-small" onClick={() => openEdit(n)}>
-                        Editar
-                      </button>
+                      <button className="nb-btn-small" onClick={() => openEdit(n)}>Editar</button>
                       {n.Estado ? (
-                        <button className="nb-btn-small danger" onClick={() => handleDelete(n)}>
-                          Desactivar
-                        </button>
+                        <button className="nb-btn-small danger" onClick={() => handleDelete(n)}>Desactivar</button>
                       ) : (
-                        <button className="nb-btn-small success" onClick={() => handleRestore(n)}>
-                          Activar
-                        </button>
+                        <button className="nb-btn-small success" onClick={() => handleRestore(n)}>Activar</button>
                       )}
                     </div>
                   </td>
                 </tr>
               ))
             ) : (
-              <tr key="empty">
-                <td colSpan="5" className="text-center">No se encontraron negocios.</td>
-              </tr>
+              <tr key="empty"><td colSpan="6" className="text-center">No se encontraron negocios que coincidan.</td></tr>
             )}
           </tbody>
         </table>
@@ -324,7 +376,11 @@ export default function GestionEmpresas() {
             <div className="nb-modal-body">
                 <form id="empresaForm" onSubmit={handleSubmit}>
                 <label>Nombre del Negocio
-                    <input value={formData.nombre} onChange={(e) => setFormData({...formData, nombre: e.target.value})} required />
+                    <input 
+                      value={formData.nombre} 
+                      onChange={(e) => setFormData({...formData, nombre: e.target.value.toUpperCase()})} 
+                      required 
+                    />
                 </label>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
@@ -351,6 +407,8 @@ export default function GestionEmpresas() {
                     onChange={(e) => setFormData({...formData, descripcion: e.target.value})} 
                     />
                 </label>
+
+              
 
                 <label>Email Público
                     <input type="email" value={formData.correoContacto} onChange={(e) => setFormData({...formData, correoContacto: e.target.value})} />
