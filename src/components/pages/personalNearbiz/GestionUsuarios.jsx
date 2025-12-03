@@ -12,14 +12,14 @@ import "./GestionUsuarios.css";
 
 const ROLES_MAP = {
   1: "Admin NearBiz",
-  2: "Personal NearBiz",
-  3: "Admin de negocio",
+  2: "Admin de negocio",
+  3: "Personal NearBiz",
 };
 
 const ROLES_OPTIONS = [
   { id: 1, label: "Admin NearBiz" },
-  { id: 2, label: "Admin de negocio" },
-  { id: 3, label: "Personal" },
+  { id: 2, label: "Personal" },
+  { id: 3, label: "Admin de negocio" },
 ];
 
 export default function GestionUsuarios() {
